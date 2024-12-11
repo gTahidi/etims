@@ -3,10 +3,12 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
-	"log"
+	"fmt"
+	"io"
 	"net/http"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -61,22 +63,25 @@ type BranchInsuranceRequest struct {
 }
 
 type ItemRequest struct {
-	Tin       string  `json:"tin"`
-	BhfId     string  `json:"bhfId"`
-	ItemCd    string  `json:"itemCd"`
-	ItemClsCd string  `json:"itemClsCd"`
-	ItemNm    string  `json:"itemNm"`
-	ItemStdNm string  `json:"itemStdNm"`
-	OrgnNatCd string  `json:"orgnNatCd"`
-	PkgUnitCd string  `json:"pkgUnitCd"`
-	QtyUnitCd string  `json:"qtyUnitCd"`
-	TaxTyCd   string  `json:"taxTyCd"`
-	BtchNo    string  `json:"btchNo"`
-	DftPrc    float64 `json:"dftPrc"`
-	RegrNm    string  `json:"regrNm"`
-	RegrId    string  `json:"regrId"`
-	ModrNm    string  `json:"modrNm"`
-	ModrId    string  `json:"modrId"`
+	Tin        string  `json:"tin"`
+	BhfId      string  `json:"bhfId"`
+	ItemCd     string  `json:"itemCd"`
+	ItemClsCd  string  `json:"itemClsCd"`
+	ItemTyCd   string  `json:"itemTyCd"`
+	ItemNm     string  `json:"itemNm"`
+	ItemStdNm  string  `json:"itemStdNm"`
+	OrgnNatCd  string  `json:"orgnNatCd"`
+	PkgUnitCd  string  `json:"pkgUnitCd"`
+	QtyUnitCd  string  `json:"qtyUnitCd"`
+	TaxTyCd    string  `json:"taxTyCd"`
+	BtchNo     string  `json:"btchNo"`
+	DftPrc     float64 `json:"dftPrc"`
+	IsrcAplcbYn string  `json:"isrcAplcbYn"`
+	UseYn      string  `json:"useYn"`
+	RegrNm     string  `json:"regrNm"`
+	RegrId     string  `json:"regrId"`
+	ModrNm     string  `json:"modrNm"`
+	ModrId     string  `json:"modrId"`
 }
 
 type StockMasterRequest struct {
@@ -216,6 +221,7 @@ type SalesTransactionRequest struct {
 	Tin         string     `json:"tin"`
 	BhfId       string     `json:"bhfId"`
 	SalesTyCd   string     `json:"salesTyCd"`
+	RcptTyCd    string     `json:"rcptTyCd"`
 	CustTin     string     `json:"custTin"`
 	CustNm      string     `json:"custNm"`
 	CustBhfId   string     `json:"custBhfId"`
@@ -272,9 +278,9 @@ type ItemCompositionRequest struct {
 	Tin           string  `json:"tin"`
 	BhfId         string  `json:"bhfId"`
 	ItemCd        string  `json:"itemCd"`
-	CmpItemCd     string  `json:"cmpItemCd"`
-	CmpItemQty    float64 `json:"cmpItemQty"`
-	CmpItemUnitCd string  `json:"cmpItemUnitCd"`
+	CpstItemCd    string  `json:"cpstItemCd"`
+	CpstQty       float64 `json:"cpstQty"`
+	CpstUnitCd    string  `json:"cpstUnitCd"`
 	RegrId        string  `json:"regrId"`
 	RegrNm        string  `json:"regrNm"`
 	ModrId        string  `json:"modrId"`
@@ -333,7 +339,82 @@ type SaleItem struct {
 	ItemExprDt string  `json:"itemExprDt"`
 }
 
+type GetItemRequest struct {
+	Tin       string `json:"tin"`
+	BhfId     string `json:"bhfId"`
+	LastReqDt string `json:"lastReqDt"`
+}
+
 func main() {
+	// Configure logrus
+	log := logrus.New()
+	log.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp:    true,
+		TimestampFormat:  "2006-01-02 15:04:05",
+		DisableColors:    false,
+		DisableTimestamp: false,
+	})
+	log.SetLevel(logrus.InfoLevel)
+
+	// Add file and line number to log output
+	log.SetReportCaller(true)
+
+	startTime := time.Now()
+	log.WithFields(logrus.Fields{
+		"tin":    tin,
+		"bhfId":  bhfId,
+		"cmcKey": cmcKey,
+	}).Info("Starting data synchronization process")
+
+	// Create a session ID for this run
+	sessionID := fmt.Sprintf("session_%d", startTime.UnixNano())
+	logger := log.WithField("session_id", sessionID)
+
+	// Track the number of successful and failed requests
+	stats := struct {
+		successful int
+		failed     int
+	}{0, 0}
+
+	// Helper function to handle common request/response pattern
+	makeRequest := func(endpoint string, requestBody []byte, description string) error {
+		requestLog := logger.WithFields(logrus.Fields{
+			"endpoint":   endpoint,
+			"request_id": fmt.Sprintf("%s_%d", description, time.Now().UnixNano()),
+		})
+
+		requestLog.WithField("request_body", string(requestBody)).Info(fmt.Sprintf("Sending %s request", description))
+
+		response, err := sendRequest(baseURL+endpoint, nil, requestBody)
+		if err != nil {
+			stats.failed++
+			requestLog.WithError(err).Error(fmt.Sprintf("Failed to send %s request", description))
+			return fmt.Errorf("%s request failed: %w", description, err)
+		}
+		defer response.Body.Close()
+
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			stats.failed++
+			requestLog.WithError(err).Error(fmt.Sprintf("Failed to read %s response body", description))
+			return fmt.Errorf("failed to read %s response body: %w", description, err)
+		}
+
+		requestLog.WithFields(logrus.Fields{
+			"status_code": response.StatusCode,
+			"headers":     response.Header,
+			"body":        string(body),
+		}).Info(fmt.Sprintf("Received %s response", description))
+
+		if response.StatusCode != http.StatusOK {
+			stats.failed++
+			return fmt.Errorf("%s request failed with status code: %d", description, response.StatusCode)
+		}
+
+		stats.successful++
+		return nil
+	}
+
 	// First, initialize the device
 	initRequest := InitRequest{
 		Tin:      tin,
@@ -343,167 +424,129 @@ func main() {
 
 	initRequestBody, err := json.Marshal(initRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal init request")
 	}
 
-	// Log the request details
-	log.Printf("Sending initialization request to: %s", baseURL+"/initializer/selectInitInfo")
-	log.Printf("Request Headers:\ntin: %s\nbhfid: %s\ncmckey: %s", tin, bhfId, cmcKey)
-	log.Printf("Request Body: %s", string(initRequestBody))
+	logger.WithFields(logrus.Fields{
+		"tin":         tin,
+		"bhfId":       bhfId,
+		"dvcSrlNo":    initRequest.DvcSrlNo,
+		"requestBody": string(initRequestBody),
+	}).Info("Sending initialization request")
 
-	initResponse, err := sendRequest(baseURL+"/initializer/selectInitInfo", nil, initRequestBody)
+	// Send initialization request
+	response, err := sendRequest(baseURL+"/initializer/selectInitInfo", map[string]string{
+		"Content-Type": "application/json; charset=utf-8",
+		"Accept":       "application/json",
+		"CMC-KEY":     cmcKey,
+		"User-Agent":  "etims-client/1.0",
+	}, initRequestBody)
 	if err != nil {
-		log.Printf("Error making request: %v", err)
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to send initialization request")
 	}
-	defer initResponse.Body.Close()
+	defer response.Body.Close()
 
-	body, err := ioutil.ReadAll(initResponse.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Printf("Error reading response body: %v", err)
-		log.Fatal(err)
-	}
-	log.Printf("Init Response Status: %d", initResponse.StatusCode)
-	log.Printf("Init Response Headers: %+v", initResponse.Header)
-	log.Printf("Init Response Body: %s", string(body))
-
-	// Only proceed with other requests if initialization is successful
-	if initResponse.StatusCode != 200 {
-		log.Printf("Device initialization failed with status code: %d", initResponse.StatusCode)
-		log.Fatal("Device initialization failed")
+		logger.WithError(err).Fatal("Failed to read initialization response body")
 	}
 
-	log.Println("Device initialization successful, proceeding with data synchronization...")
+	// Log response details
+	logger.WithFields(logrus.Fields{
+		"statusCode":    response.StatusCode,
+		"headers":       response.Header,
+		"responseBody": string(body),
+		"contentType":  response.Header.Get("Content-Type"),
+	}).Info("Received initialization response")
+
+	if response.StatusCode != http.StatusOK {
+		logger.WithFields(logrus.Fields{
+			"statusCode": response.StatusCode,
+			"body":      string(body),
+		}).Fatal("Initialization request failed")
+	}
+
+	logger.Info("Device initialization successful, proceeding with data synchronization...")
 
 	// 1. Code Data Sequence
 	codeRequest := CodeRequest{
 		Tin:       tin,
 		BhfId:     bhfId,
-		LastReqDt: "20240101000000",
+		LastReqDt: time.Now().Format("20060102150405"), // Current timestamp
 	}
 
 	codeRequestBody, err := json.Marshal(codeRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal code request")
 	}
 
-	log.Println("Fetching code list...")
-	codeResponse, err := sendRequest(baseURL+"/code/selectCodes", nil, codeRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/code/selectCodes", codeRequestBody, "code list"); err != nil {
+		logger.WithError(err).Fatal("Failed to fetch code list")
 	}
-	defer codeResponse.Body.Close()
-
-	codeBody, err := ioutil.ReadAll(codeResponse.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("Code List Response Status: %d", codeResponse.StatusCode)
-	log.Printf("Code List Response Body: %s", string(codeBody))
 
 	// 2. Notice List
 	noticeRequest := NoticeRequest{
 		Tin:       tin,
 		BhfId:     bhfId,
-		LastReqDt: "20240101000000",
+		LastReqDt: time.Now().Format("20060102150405"), // Current timestamp
 	}
 
 	noticeRequestBody, err := json.Marshal(noticeRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal notice request")
 	}
 
-	log.Println("Fetching notice list...")
-	noticeResponse, err := sendRequest(baseURL+"/notices/selectNotices", nil, noticeRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/notices/selectNotices", noticeRequestBody, "notice list"); err != nil {
+		logger.WithError(err).Fatal("Failed to fetch notice list")
 	}
-	defer noticeResponse.Body.Close()
-
-	noticeBody, err := ioutil.ReadAll(noticeResponse.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("Notice List Response Status: %d", noticeResponse.StatusCode)
-	log.Printf("Notice List Response Body: %s", string(noticeBody))
 
 	// 3. Branch List
 	branchRequest := BranchRequest{
 		Tin:       tin,
 		BhfId:     bhfId,
-		LastReqDt: "20240101000000",
+		LastReqDt: time.Now().Format("20060102150405"), // Current timestamp
 	}
 
 	branchRequestBody, err := json.Marshal(branchRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal branch request")
 	}
 
-	log.Println("Fetching branch list...")
-	branchResponse, err := sendRequest(baseURL+"/branches/selectBranches", nil, branchRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/branches/selectBranches", branchRequestBody, "branch list"); err != nil {
+		logger.WithError(err).Fatal("Failed to fetch branch list")
 	}
-	defer branchResponse.Body.Close()
-
-	branchBody, err := ioutil.ReadAll(branchResponse.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("Branch List Response Status: %d", branchResponse.StatusCode)
-	log.Printf("Branch List Response Body: %s", string(branchBody))
 
 	// 4. Import Items
 	importRequest := ImportItemRequest{
 		Tin:       tin,
 		BhfId:     bhfId,
-		LastReqDt: "20240101000000",
+		LastReqDt: time.Now().Format("20060102150405"), // Current timestamp
 	}
 
 	importRequestBody, err := json.Marshal(importRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal import request")
 	}
 
-	log.Println("Fetching import items...")
-	importResponse, err := sendRequest(baseURL+"/imports/selectImportItems", nil, importRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/imports/selectImportItems", importRequestBody, "import items"); err != nil {
+		logger.WithError(err).Fatal("Failed to fetch import items")
 	}
-	defer importResponse.Body.Close()
-
-	importBody, err := ioutil.ReadAll(importResponse.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("Import Items Response Status: %d", importResponse.StatusCode)
-	log.Printf("Import Items Response Body: %s", string(importBody))
 
 	// 5. Purchase Transactions
 	purchaseRequest := PurchaseRequest{
 		Tin:       tin,
 		BhfId:     bhfId,
-		LastReqDt: "20240101000000",
+		LastReqDt: time.Now().Format("20060102150405"), // Current timestamp
 	}
 
 	purchaseRequestBody, err := json.Marshal(purchaseRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal purchase request")
 	}
 
-	log.Println("Fetching purchase transactions...")
-	purchaseResponse, err := sendRequest(baseURL+"/trnsPurchase/selectTrnsPurchaseSales", nil, purchaseRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/trnsPurchase/selectTrnsPurchaseSales", purchaseRequestBody, "purchase transactions"); err != nil {
+		logger.WithError(err).Fatal("Failed to fetch purchase transactions")
 	}
-	defer purchaseResponse.Body.Close()
-
-	purchaseBody, err := ioutil.ReadAll(purchaseResponse.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("Purchase Transactions Response Status: %d", purchaseResponse.StatusCode)
-	log.Printf("Purchase Transactions Response Body: %s", string(purchaseBody))
 
 	// 6. Stock Items
 	stockRequest := StockRequest{
@@ -511,7 +554,7 @@ func main() {
 		BhfId:     bhfId,
 		ItemCd:    "KE1NTXU0000006",
 		RsdQty:    10,
-		LastReqDt: "20240101000000",
+		LastReqDt: time.Now().Format("20060102150405"), // Current timestamp
 		RegrId:    "Admin",
 		RegrNm:    "Admin",
 		ModrId:    "Admin",
@@ -520,43 +563,109 @@ func main() {
 
 	stockRequestBody, err := json.Marshal(stockRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal stock request")
 	}
 
-	log.Println("Fetching stock items...")
-	stockResponse, err := sendRequest(baseURL+"/stock/selectStockItems", nil, stockRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/stock/selectStockItems", stockRequestBody, "stock items"); err != nil {
+		logger.WithError(err).Fatal("Failed to fetch stock items")
 	}
-	defer stockResponse.Body.Close()
 
-	stockBody, err := ioutil.ReadAll(stockResponse.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("Stock Items Response Status: %d", stockResponse.StatusCode)
-	log.Printf("Stock Items Response Body: %s", string(stockBody))
-
-	// 8. Item Classification
+	// 7. Item Classification List
 	itemClassRequest := ItemClassRequest{
 		Tin:       tin,
 		BhfId:     bhfId,
-		LastReqDt: "20240101000000",
+		LastReqDt: time.Now().Format("20060102150405"), // Current timestamp
 	}
 
 	itemClassRequestBody, err := json.Marshal(itemClassRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal item classification request")
 	}
 
-	itemClassResponse, err := sendRequest(baseURL+"/itemClass/selectItemsClass", nil, itemClassRequestBody)
+	if err := makeRequest("/itemClass/selectItemsClass", itemClassRequestBody, "item classification list"); err != nil {
+		logger.WithError(err).Fatal("Failed to fetch item classification list")
+	}
+
+	// 8. Customer List (PIN List)
+	customerRequest := CustomerRequest{
+		Tin:      tin,
+		BhfId:    bhfId,
+		CustmTin: "A123456789Z", // Must be between 9-15 characters
+	}
+
+	customerRequestBody, err := json.Marshal(customerRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal customer request")
 	}
-	log.Printf("Item Classification Response Status: %d", itemClassResponse.StatusCode)
-	log.Printf("Item Classification Response Body: %s", itemClassResponse.Body)
 
-	// 9. Branch Insurance
+	if err := makeRequest("/customers/selectCustomer", customerRequestBody, "customer list"); err != nil {
+		logger.WithError(err).Fatal("Failed to fetch customer list")
+	}
+
+	// 9. Send Branch Customer Information
+	branchCustomerRequest := BranchCustomerRequest{
+		Tin:     tin,
+		BhfId:   bhfId,
+		CustNo:  "CUST001",
+		CustTin: "A123456789Z",
+		CustNm:  "Test Customer",
+		UseYn:   "Y",
+		RegrNm:  "Admin",
+		RegrId:  "Admin",
+		ModrNm:  "Admin",
+		ModrId:  "Admin",
+	}
+
+	branchCustomerRequestBody, err := json.Marshal(branchCustomerRequest)
+	if err != nil {
+		logger.WithError(err).Fatal("Failed to marshal branch customer request")
+	}
+
+	if err := makeRequest("/branches/saveBrancheCustomers", branchCustomerRequestBody, "branch customer information"); err != nil {
+		logger.WithError(err).Fatal("Failed to send branch customer information")
+	}
+
+	// 10. Send Branch User Account
+	branchUserRequest := BranchUserRequest{
+		Tin:    tin,
+		BhfId:  bhfId,
+		UserId: "user001",
+		UserNm: "Test User",
+		Pwd:    "password123",
+		RoleCd: "ADMIN",
+		UseYn:  "Y",
+		RegrId: "Admin",
+		RegrNm: "Admin",
+		ModrId: "Admin",
+		ModrNm: "Admin",
+	}
+
+	branchUserRequestBody, err := json.Marshal(branchUserRequest)
+	if err != nil {
+		logger.WithError(err).Fatal("Failed to marshal branch user request")
+	}
+
+	if err := makeRequest("/branches/saveBrancheUsers", branchUserRequestBody, "branch user account"); err != nil {
+		logger.WithError(err).Fatal("Failed to send branch user account")
+	}
+
+	// 11. Item Classification
+	itemClassRequest = ItemClassRequest{
+		Tin:       tin,
+		BhfId:     bhfId,
+		LastReqDt: time.Now().Format("20060102150405"), // Current timestamp
+	}
+
+	itemClassRequestBody, err = json.Marshal(itemClassRequest)
+	if err != nil {
+		logger.WithError(err).Fatal("Failed to marshal item classification request")
+	}
+
+	if err := makeRequest("/itemClass/selectItemsClass", itemClassRequestBody, "item classification"); err != nil {
+		logger.WithError(err).Fatal("Failed to fetch item classification")
+	}
+
+	// 12. Branch Insurance
 	branchInsuranceRequest := BranchInsuranceRequest{
 		Tin:     tin,
 		BhfId:   bhfId,
@@ -572,49 +681,46 @@ func main() {
 
 	branchInsuranceRequestBody, err := json.Marshal(branchInsuranceRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal branch insurance request")
 	}
 
-	branchInsuranceResponse, err := sendRequest(baseURL+"/branches/saveBrancheInsurances", nil, branchInsuranceRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/branches/saveBrancheInsurances", branchInsuranceRequestBody, "branch insurance"); err != nil {
+		logger.WithError(err).Fatal("Failed to send branch insurance")
 	}
-	log.Printf("Branch Insurance Response Status: %d", branchInsuranceResponse.StatusCode)
-	log.Printf("Branch Insurance Response Body: %s", branchInsuranceResponse.Body)
 
-	// 10. Save Item
+	// 13. Save Item
 	itemRequest := ItemRequest{
-		Tin:       tin,
-		BhfId:     bhfId,
-		ItemCd:    "KE1NTXU0000007",
-		ItemClsCd: "5022110801",
-		ItemNm:    "Test Item",
-		ItemStdNm: "Standard Item",
-		OrgnNatCd: "KE",
-		PkgUnitCd: "EA",
-		QtyUnitCd: "EA",
-		TaxTyCd:   "B",
-		BtchNo:    "BATCH001",
-		DftPrc:    1000.00,
-		RegrNm:    "Admin",
-		RegrId:    "Admin",
-		ModrNm:    "Admin",
-		ModrId:    "Admin",
+		Tin:         tin,
+		BhfId:       bhfId,
+		ItemCd:      "KE1NTXU0000007",
+		ItemClsCd:   "5022110801",
+		ItemTyCd:    "1",
+		ItemNm:      "Test Item",
+		ItemStdNm:   "Standard Item",
+		OrgnNatCd:   "KE",
+		PkgUnitCd:   "NT",
+		QtyUnitCd:   "U",
+		TaxTyCd:     "B",
+		BtchNo:      "",
+		DftPrc:      1000.00,
+		IsrcAplcbYn: "N",
+		UseYn:       "Y",
+		RegrNm:      "Admin",
+		RegrId:      "Admin",
+		ModrNm:      "Admin",
+		ModrId:      "Admin",
 	}
 
 	itemRequestBody, err := json.Marshal(itemRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal item request")
 	}
 
-	itemResponse, err := sendRequest(baseURL+"/items/saveItems", nil, itemRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/items/saveItems", itemRequestBody, "item"); err != nil {
+		logger.WithError(err).Fatal("Failed to send item")
 	}
-	log.Printf("Save Item Response Status: %d", itemResponse.StatusCode)
-	log.Printf("Save Item Response Body: %s", itemResponse.Body)
 
-	// 11. Stock Master
+	// 14. Stock Master
 	stockMasterRequest := StockMasterRequest{
 		Tin:    tin,
 		BhfId:  bhfId,
@@ -628,67 +734,55 @@ func main() {
 
 	stockMasterRequestBody, err := json.Marshal(stockMasterRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal stock master request")
 	}
 
-	stockMasterResponse, err := sendRequest(baseURL+"/stockMaster/saveStockMaster", nil, stockMasterRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/stockMaster/saveStockMaster", stockMasterRequestBody, "stock master"); err != nil {
+		logger.WithError(err).Fatal("Failed to send stock master")
 	}
-	log.Printf("Stock Master Response Status: %d", stockMasterResponse.StatusCode)
-	log.Printf("Stock Master Response Body: %s", stockMasterResponse.Body)
 
 	// Test Customer Information
 	customerInfoRequest := CustomerInfoRequest{
 		Tin:        tin,
 		CustmTin:   "A123456789Z",
 		CustmBhfId: "00",
-		LastReqDt:  "20240101000000",
+		LastReqDt:  time.Now().Format("20060102150405"), // Current timestamp
 	}
 
 	customerInfoRequestBody, err := json.Marshal(customerInfoRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal customer info request")
 	}
 
-	customerInfoResponse, err := sendRequest(baseURL+"/customers/selectCustomer", nil, customerInfoRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/customers/selectCustomer", customerInfoRequestBody, "customer info"); err != nil {
+		logger.WithError(err).Fatal("Failed to fetch customer info")
 	}
-	defer customerInfoResponse.Body.Close()
-	log.Printf("Customer Info Response Status: %d", customerInfoResponse.StatusCode)
-	log.Printf("Customer Info Response Body: %s", customerInfoResponse.Body)
 
 	// Save Branch Customer
-	branchCustomerRequest := BranchCustomerInfoRequest{
+	branchCustomerRequest = BranchCustomerRequest{
 		Tin:     tin,
 		BhfId:   bhfId,
 		CustNo:  "CUST001",
 		CustTin: "A123456789B",
 		CustNm:  "Test Customer",
-		TelNo:   "0712345678",
-		Email:   "test@example.com",
-		Fax:     "0712345679",
+		UseYn:   "Y",
 		RegrId:  "Admin",
 		RegrNm:  "Admin",
 		ModrId:  "Admin",
 		ModrNm:  "Admin",
 	}
 
-	branchCustomerRequestBody, err := json.Marshal(branchCustomerRequest)
+	branchCustomerRequestBody, err = json.Marshal(branchCustomerRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal branch customer request")
 	}
 
-	branchCustomerResponse, err := sendRequest(baseURL+"/branches/saveBrancheCustomers", nil, branchCustomerRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/branches/saveBrancheCustomers", branchCustomerRequestBody, "branch customer"); err != nil {
+		logger.WithError(err).Fatal("Failed to send branch customer")
 	}
-	log.Printf("Branch Customer Response Status: %d", branchCustomerResponse.StatusCode)
-	log.Printf("Branch Customer Response Body: %s", branchCustomerResponse.Body)
 
 	// Save Branch User Account
-	branchUserRequest := BranchUserRequest{
+	branchUserRequest = BranchUserRequest{
 		Tin:    tin,
 		BhfId:  bhfId,
 		UserId: "USER001",
@@ -702,104 +796,155 @@ func main() {
 		ModrNm: "Admin",
 	}
 
-	branchUserRequestBody, err := json.Marshal(branchUserRequest)
+	branchUserRequestBody, err = json.Marshal(branchUserRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal branch user request")
 	}
 
-	branchUserResponse, err := sendRequest(baseURL+"/branches/saveBrancheUsers", nil, branchUserRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/branches/saveBrancheUsers", branchUserRequestBody, "branch user account"); err != nil {
+		logger.WithError(err).Fatal("Failed to send branch user account")
 	}
-	log.Printf("Branch User Response Status: %d", branchUserResponse.StatusCode)
-	log.Printf("Branch User Response Body: %s", branchUserResponse.Body)
 
 	// Save Item Composition
 	itemCompositionRequest := ItemCompositionRequest{
-		Tin:           tin,
-		BhfId:         bhfId,
-		ItemCd:        "KE1NTXU0000007",
-		CmpItemCd:     "KE1NTXU0000008",
-		CmpItemQty:    1.0,
-		CmpItemUnitCd: "EA",
-		RegrId:        "Admin",
-		RegrNm:        "Admin",
-		ModrId:        "Admin",
-		ModrNm:        "Admin",
+		Tin:        tin,
+		BhfId:      bhfId,
+		ItemCd:     "KE1NTXU0000007", // Using the item we created earlier
+		CpstItemCd: "KE1NTXU0000006", // Using existing item from stock request
+		CpstQty:    1.0,
+		CpstUnitCd: "U",
+		RegrId:     "Admin",
+		RegrNm:     "Admin",
+		ModrId:     "Admin",
+		ModrNm:     "Admin",
 	}
 
 	itemCompositionRequestBody, err := json.Marshal(itemCompositionRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal item composition request")
 	}
 
-	itemCompositionResponse, err := sendRequest(baseURL+"/items/saveItemComposition", nil, itemCompositionRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/items/saveItemComposition", itemCompositionRequestBody, "item composition"); err != nil {
+		logger.WithError(err).Fatal("Failed to send item composition")
 	}
-	log.Printf("Item Composition Response Status: %d", itemCompositionResponse.StatusCode)
-	log.Printf("Item Composition Response Body: %s", itemCompositionResponse.Body)
 
-	// Save Stock In/Out
+	// Stock In/Out
 	stockInOutRequest := StockInOutRequest{
-		Tin:   tin,
-		BhfId: "00",
+		Tin:    tin,
+		BhfId:  bhfId,
 		StockItems: []StockItem{
 			{
-				ItemCd:     "ITEM001",
-				ItemClsCd:  "01",
+				ItemCd:     "KE1NTXU0000007", // Using the item we created earlier
+				ItemClsCd:  "5022110801",
 				ItemNm:     "Test Item",
-				PkgUnitCd:  "EA",
-				QtyUnitCd:  "EA",
+				PkgUnitCd:  "NT",
+				QtyUnitCd:  "U",
 				TaxTyCd:    "B",
-				Bcd:        "123",
-				RegBhfId:   "00",
+				Bcd:        "",
+				RegBhfId:   bhfId,
 				Pkg:        1,
-				Qty:        1,
+				Qty:        10,
 				DcRt:       0,
-				SupplrTin:  "A123456789Z",
-				PchsTyCd:   "01",
-				OrgnNatCd:  "KE",
-				ItemExprDt: "20241231",
-				ItemSttsCd: "01",
-				RegrId:     "SYSTEM",
-				RegrNm:     "SYSTEM",
-				ModrId:     "SYSTEM",
-				ModrNm:     "SYSTEM",
+				SupplrTin:  tin,           // Using our own TIN as supplier
+				PchsTyCd:   "NS",          // Changed to NS (Normal Stock)
+				OrgnNatCd:  "KE",          // Origin nation code
+				ItemExprDt: "20241231",    // Item expiry date
+				ItemSttsCd: "01",          // Item status code
+				RegrId:     "Admin",
+				RegrNm:     "Admin",
+				ModrId:     "Admin",
+				ModrNm:     "Admin",
 			},
 		},
+		LastReqDt: time.Now().Format("20060102150405"), // Using current timestamp
+		RegrId:    "Admin",
+		RegrNm:    "Admin",
+		ModrId:    "Admin",
+		ModrNm:    "Admin",
 	}
 
 	stockInOutRequestBody, err := json.Marshal(stockInOutRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal stock in/out request")
 	}
 
-	stockInOutResponse, err := sendRequest(baseURL+"/stock/saveStockItems", nil, stockInOutRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/stock/saveStockItems", stockInOutRequestBody, "stock in/out"); err != nil {
+		logger.WithError(err).Fatal("Failed to send stock in/out")
 	}
-	log.Printf("Stock In/Out Response Status: %d", stockInOutResponse.StatusCode)
-	log.Printf("Stock In/Out Response Body: %s", stockInOutResponse.Body)
+
+	// Get Item Information
+	itemInfoRequest := GetItemRequest{
+		Tin:       tin,
+		BhfId:     bhfId,
+		LastReqDt: time.Now().Format("20060102150405"), // Current timestamp
+	}
+
+	itemInfoRequestBody, err := json.Marshal(itemInfoRequest)
+	if err != nil {
+		logger.WithError(err).Fatal("Failed to marshal item info request")
+	}
+
+	if err := makeRequest("/items/selectItems", itemInfoRequestBody, "item information"); err != nil {
+		logger.WithError(err).Fatal("Failed to fetch item information")
+	}
+
+	// Send Converted Import Item Information
+	importUpdateRequest := struct {
+		Tin            string  `json:"tin"`
+		BhfId          string  `json:"bhfId"`
+		TaskCd         string  `json:"taskCd"`
+		DclDe          string  `json:"dclDe"`
+		ItemSeq        int     `json:"itemSeq"`
+		HsCd           string  `json:"hsCd"`
+		ItemClsCd      string  `json:"itemClsCd"`
+		ItemCd         string  `json:"itemCd"`
+		ImptItemSttsCd string  `json:"imptItemSttsCd"`
+		Remark         string  `json:"remark"`
+		ModrNm         string  `json:"modrNm"`
+		ModrId         string  `json:"modrId"`
+	}{
+		Tin:            tin,
+		BhfId:          bhfId,
+		TaskCd:         "2231943",
+		DclDe:          "20240101",
+		ItemSeq:        1,
+		HsCd:           "1231531231",
+		ItemClsCd:      "5022110801",
+		ItemCd:         "KE1NTXU0000001",
+		ImptItemSttsCd: "1",
+		Remark:         "Import update",
+		ModrNm:         "Admin",
+		ModrId:         "Admin",
+	}
+
+	importUpdateRequestBody, err := json.Marshal(importUpdateRequest)
+	if err != nil {
+		logger.WithError(err).Fatal("Failed to marshal import update request")
+	}
+
+	if err := makeRequest("/imports/updateImportItems", importUpdateRequestBody, "import update"); err != nil {
+		logger.WithError(err).Fatal("Failed to update import items")
+	}
 
 	// Sales Transaction
 	salesTransactionRequest := SalesTransactionRequest{
 		Tin:         tin,
-		BhfId:       "00",
-		SalesTyCd:   "01",
-		CustTin:     "A123456789Z",
+		BhfId:       bhfId,
+		SalesTyCd:   "NS",        // Changed to NS (Normal Sale)
+		RcptTyCd:    "NR",        // Changed to NR (Normal Receipt)
+		CustTin:     tin,         // Using our own TIN as customer
 		CustNm:      "Test Customer",
-		CustBhfId:   "00",
-		SalesSttsCd: "01",
-		CfmDt:       time.Now().Format("20060102150405"),
+		CustBhfId:   bhfId,
+		SalesSttsCd: "02",        // 02: Completed
+		CfmDt:       "20241211085127", // Current timestamp
 		SaleItems: []SaleItem{
 			{
 				ItemSeq:    1,
-				ItemCd:     "ITEM001",
-				ItemClsCd:  "01",
+				ItemCd:     "KE1NTXU0000007", // Using the item we created earlier
+				ItemClsCd:  "5022110801",
 				ItemNm:     "Test Item",
-				PkgUnitCd:  "EA",
-				QtyUnitCd:  "EA",
+				PkgUnitCd:  "NT",
+				QtyUnitCd:  "U",
 				Pkg:        1,
 				Qty:        1,
 				PrcAmt:     1000.00,
@@ -830,69 +975,112 @@ func main() {
 		TotTaxblAmt: 1000.00,
 		TotTaxAmt:   160.00,
 		TotAmt:      1160.00,
-		PmtTyCd:     "01",
-		RegrId:      "SYSTEM",
-		RegrNm:      "SYSTEM",
-		ModrId:      "SYSTEM",
-		ModrNm:      "SYSTEM",
+		PmtTyCd:     "01",       // 01: Cash
+		RegrId:      "Admin",
+		RegrNm:      "Admin",
+		ModrId:      "Admin",
+		ModrNm:      "Admin",
 	}
 
 	salesTransactionRequestBody, err := json.Marshal(salesTransactionRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal sales transaction request")
 	}
 
-	salesTransactionResponse, err := sendRequest(baseURL+"/trnsSales/saveSales", nil, salesTransactionRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/trnsSales/saveSales", salesTransactionRequestBody, "sales transaction"); err != nil {
+		logger.WithError(err).Fatal("Failed to send sales transaction")
 	}
-	log.Printf("Sales Transaction Response Status: %d", salesTransactionResponse.StatusCode)
-	log.Printf("Sales Transaction Response Body: %s", salesTransactionResponse.Body)
 
 	// Stock Movement
 	stockMovementRequest := StockMovementRequest{
 		Tin:       tin,
 		BhfId:     bhfId,
-		LastReqDt: time.Now().Format("20060102150405"),
+		LastReqDt: time.Now().Format("20060102150405"), // Current timestamp
 	}
 
 	stockMovementRequestBody, err := json.Marshal(stockMovementRequest)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithError(err).Fatal("Failed to marshal stock movement request")
 	}
 
-	stockMovementResponse, err := sendRequest(baseURL+"/stock/selectStockItems", nil, stockMovementRequestBody)
-	if err != nil {
-		log.Fatal(err)
+	if err := makeRequest("/stock/selectStockItems", stockMovementRequestBody, "stock movement"); err != nil {
+		logger.WithError(err).Fatal("Failed to fetch stock movement")
 	}
-	log.Printf("Stock Movement Response Status: %d", stockMovementResponse.StatusCode)
-	log.Printf("Stock Movement Response Body: %s", stockMovementResponse.Body)
 
-	log.Println("Data synchronization completed successfully")
+	logger.WithFields(logrus.Fields{
+		"successful_requests": stats.successful,
+		"failed_requests":     stats.failed,
+	}).Info("Data synchronization completed")
+
+	logger.Info("Data synchronization completed successfully")
 }
 
 func sendRequest(url string, headers map[string]string, requestBody []byte) (*http.Response, error) {
+	log := logrus.WithFields(logrus.Fields{
+		"url":     url,
+		"headers": headers,
+		"method":  "POST",
+	})
+
+	// Generate request ID for tracing
+	requestID := fmt.Sprintf("%d", time.Now().UnixNano())
+	log = log.WithField("request_id", requestID)
+
+	// Create request
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
-	// Set common headers
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("tin", tin)
-	req.Header.Set("bhfid", bhfId)
-	req.Header.Set("cmckey", cmcKey)
+	// Set default headers
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("X-Request-ID", requestID)
+	req.Header.Set("CMC-KEY", cmcKey)
+	req.Header.Set("User-Agent", "etims-client/1.0")
 
-	// Set additional headers if provided
+	// Set custom headers
 	for key, value := range headers {
 		req.Header.Set(key, value)
 	}
 
-	client := &http.Client{}
+	// Log request details
+	log.WithFields(logrus.Fields{
+		"body_size":     len(requestBody),
+		"body":          string(requestBody),
+		"request_headers": req.Header,
+	}).Info("Sending request")
+
+	// Record start time for request duration
+	start := time.Now()
+
+	// Send request with longer timeout
+	client := &http.Client{
+		Timeout: time.Second * 360,
+		Transport: &http.Transport{
+			MaxIdleConns:        100,
+			MaxIdleConnsPerHost: 100,
+			IdleConnTimeout:     90 * time.Second,
+			TLSHandshakeTimeout: 10 * time.Second,
+		},
+	}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		log.WithError(err).Error("Request failed")
+		return nil, fmt.Errorf("request failed: %w", err)
 	}
+
+	// Calculate request duration
+	duration := time.Since(start)
+
+	// Log response details
+	log.WithFields(logrus.Fields{
+		"status_code":       resp.StatusCode,
+		"duration_ms":       duration.Milliseconds(),
+		"content_length":    resp.ContentLength,
+		"response_headers":  resp.Header,
+		"content_type":      resp.Header.Get("Content-Type"),
+	}).Info("Received response")
 
 	return resp, nil
 }
