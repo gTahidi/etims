@@ -1,0 +1,320 @@
+Certainly! Below is a summary of the logs and returned messages for each request, including the code returned, message returned, and error returned where necessary, along with the endpoint:
+
+### Initialization Request
+- **Endpoint**: `/initializer/selectInitInfo`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","dvcSrlNo":"7ba05e23-850a-44dd-b09a-2eac8405e592"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 902
+  - **Result Message**: "This device is installed"
+  - **Result Date**: 20241211112953
+  - **Data**: null
+
+### Code List Request
+- **Endpoint**: `/code/selectCodes`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","lastReqDt":"20241211113156"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 001
+  - **Result Message**: "There is no search result"
+  - **Result Date**: 20241211112954
+  - **Data**: null
+
+### Notice List Request
+- **Endpoint**: `/notices/selectNotices`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","lastReqDt":"20241211113158"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 001
+  - **Result Message**: "There is no search result"
+  - **Result Date**: 20241211112957
+  - **Data**: null
+
+### Branch List Request
+- **Endpoint**: `/branches/selectBranches`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","lastReqDt":"20241211113203"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 001
+  - **Result Message**: "There is no search result"
+  - **Result Date**: 20241211113000
+  - **Data**: null
+
+### Import Items Request
+- **Endpoint**: `/imports/selectImportItems`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","lastReqDt":"20241211113204"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 001
+  - **Result Message**: "There is no search result"
+  - **Result Date**: 20241211113003
+  - **Data**: null
+
+### Purchase Transactions Request
+- **Endpoint**: `/trnsPurchase/selectTrnsPurchaseSales`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","lastReqDt":"20241211113207"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 001
+  - **Result Message**: "There is no search result"
+  - **Result Date**: 20241211113005
+  - **Data**: null
+
+### Stock Items Request
+- **Endpoint**: `/stock/selectStockItems`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","itemCd":"KE1NTXU0000006","rsdQty":10,"lastReqDt":"20241211113209","regrId":"Admin","regrNm":"Admin","modrId":"Admin","modrNm":"Admin"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 001
+  - **Result Message**: "There is no search result"
+  - **Result Date**: 20241211113006
+  - **Data**: null
+
+### Item Classification List Request
+- **Endpoint**: `/itemClass/selectItemsClass`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","lastReqDt":"20241211113210"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 001
+  - **Result Message**: "There is no search result"
+  - **Result Date**: 20241211113008
+  - **Data**: null
+
+### Customer List Request
+- **Endpoint**: `/customers/selectCustomer`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","custmTin":"A123456789Z"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 001
+  - **Result Message**: "There is no search result"
+  - **Result Date**: 20241211113010
+  - **Data**: null
+
+### Branch Customer Information Request
+- **Endpoint**: `/branches/saveBrancheCustomers`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","custNo":"CUST001","custTin":"A123456789Z","custNm":"Test Customer","useYn":"Y","regrNm":"Admin","regrId":"Admin","modrNm":"Admin","modrId":"Admin"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 000
+  - **Result Message**: "Successful"
+  - **Result Date**: 20241211113011
+  - **Data**: null
+
+### Branch User Account Request
+- **Endpoint**: `/branches/saveBrancheUsers`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","userId":"user001","userNm":"Test User","pwd":"password123","roleCd":"ADMIN","useYn":"Y","regrId":"Admin","regrNm":"Admin","modrId":"Admin","modrNm":"Admin"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 000
+  - **Result Message**: "Successful"
+  - **Result Date**: 20241211113013
+  - **Data**: null
+
+### Item Classification Request
+- **Endpoint**: `/itemClass/selectItemsClass`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","lastReqDt":"20241211113217"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 001
+  - **Result Message**: "There is no search result"
+  - **Result Date**: 20241211113015
+  - **Data**: null
+
+### Branch Insurance Request
+- **Endpoint**: `/branches/saveBrancheInsurances`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","isrccCd":"ISRCC01","isrccNm":"Sample Insurance","isrcRt":16,"useYn":"Y","regrNm":"Admin","regrId":"Admin","modrNm":"Admin","modrId":"Admin"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 000
+  - **Result Message**: "Successful"
+  - **Result Date**: 20241211113016
+  - **Data**: null
+
+### Item Request
+- **Endpoint**: `/items/saveItems`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","itemCd":"KE1NTXU0000007","itemClsCd":"5022110801","itemTyCd":"1","itemNm":"Test Item","itemStdNm":"Standard Item","orgnNatCd":"KE","pkgUnitCd":"NT","qtyUnitCd":"U","taxTyCd":"B","btchNo":"","dftPrc":1000,"isrcAplcbYn":"N","useYn":"Y","regrNm":"Admin","regrId":"Admin","modrNm":"Admin","modrId":"Admin"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 000
+  - **Result Message**: "Successful"
+  - **Result Date**: 20241211113018
+  - **Data**: null
+
+### Stock Master Request
+- **Endpoint**: `/stockMaster/saveStockMaster`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","itemCd":"KE1NTXU000007","rsdQty":100,"regrId":"Admin","regrNm":"Admin","modrId":"Admin","modrNm":"Admin"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 000
+  - **Result Message**: "Successful"
+  - **Result Date**: 20241211113019
+  - **Data**: null
+
+### Customer Info Request
+- **Endpoint**: `/customers/selectCustomer`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","custmTin":"A123456789Z","custmBhfId":"00","lastReqDt":"20241211113223"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 899
+  - **Result Message**: "An error regarding Client occurred."
+  - **Result Date**: null
+  - **Data**: null
+
+### Branch Customer Request
+- **Endpoint**: `/branches/saveBrancheCustomers`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","custNo":"CUST001","custTin":"A123456789B","custNm":"Test Customer","useYn":"Y","regrNm":"Admin","regrId":"Admin","modrNm":"Admin","modrId":"Admin"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 000
+  - **Result Message**: "Successful"
+  - **Result Date**: 20241211113021
+  - **Data**: null
+
+### Branch User Account Request
+- **Endpoint**: `/branches/saveBrancheUsers`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","userId":"USER001","userNm":"Test User","pwd":"password123","roleCd":"ADMIN","useYn":"Y","regrId":"Admin","regrNm":"Admin","modrId":"Admin","modrNm":"Admin"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 000
+  - **Result Message**: "Successful"
+  - **Result Date**: 20241211113023
+  - **Data**: null
+
+### Item Composition Request
+- **Endpoint**: `/items/saveItemComposition`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","itemCd":"KE1NTXU0000007","cpstItemCd":"KE1NTXU0000006","cpstQty":1,"cpstUnitCd":"U","regrId":"Admin","regrNm":"Admin","modrId":"Admin","modrNm":"Admin"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 000
+  - **Result Message**: "Successful"
+  - **Result Date**: 20241211113025
+  - **Data**: null
+
+### Stock In/Out Request
+- **Endpoint**: `/stock/saveStockItems`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","stockItems":[{"itemCd":"KE1NTXU0000007","itemClsCd":"5022110801","itemNm":"Test Item","pkgUnitCd":"NT","qtyUnitCd":"U","taxTyCd":"B","bcd":"","regBhfId":"00","pkg":1,"qty":10,"dcRt":0,"supplrTin":"P052248771P","pchsTyCd":"NS","orgnNatCd":"KE","itemExprDt":"20241231","itemSttsCd":"01","regrId":"Admin","regrNm":"Admin","modrId":"Admin","modrNm":"Admin"}],"lastReqDt":"20241211113229","regrId":"Admin","regrNm":"Admin","modrId":"Admin","modrNm":"Admin"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 899
+  - **Result Message**: "An error regarding Client occurred."
+  - **Result Date**: null
+  - **Data**: null
+
+### Item Information Request
+- **Endpoint**: `/items/selectItems`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","lastReqDt":"20241211113229"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 001
+  - **Result Message**: "There is no search result"
+  - **Result Date**: 20241211113027
+  - **Data**: null
+
+### Import Update Request
+- **Endpoint**: `/imports/updateImportItems`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","taskCd":"2231943","dclDe":"20240101","itemSeq":1,"hsCd":"1231531231","itemClsCd":"5022110801","itemCd":"KE1NTXU0000001","imptItemSttsCd":"1","remark":"Import update","modrNm":"Admin","modrId":"Admin"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 000
+  - **Result Message**: "Successful"
+  - **Result Date**: 20241211113029
+  - **Data**: null
+
+### Sales Transaction Request
+- **Endpoint**: `/trnsSales/saveSales`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","salesTyCd":"NS","rcptTyCd":"NR","custTin":"P052248771P","custNm":"Test Customer","custBhfId":"00","salesSttsCd":"02","cfmDt":"20241211085127","saleItems":[{"itemSeq":1,"itemCd":"KE1NTXU0000007","itemClsCd":"5022110801","itemNm":"Test Item","pkgUnitCd":"NT","qtyUnitCd":"U","pkg":1,"qty":1,"prcAmt":1000,"dcRt":0,"dcAmt":0,"taxTyCd":"B","taxAmt":160,"totAmt":1160,"itemExprDt":"20241231"}],"totItemCnt":1,"taxblAmtA":0,"taxblAmtB":1000,"taxblAmtC":0,"taxblAmtD":0,"taxblAmtE":0,"taxRtA":0,"taxRtB":16,"taxRtC":0,"taxRtD":0,"taxRtE":0,"taxAmtA":0,"taxAmtB":160,"taxAmtC":0,"taxAmtD":0,"taxAmtE":0,"totTaxblAmt":1000,"totTaxAmt":160,"totAmt":1160,"pmtTyCd":"01","regrId":"Admin","regrNm":"Admin","modrId":"Admin","modrNm":"Admin"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 834
+  - **Result Message**: "SalesType and ReceiptType must be NS-NR-TS-TR-CS-CR-PS check your inputs ."
+  - **Result Date**: null
+  - **Data**: null
+
+### Stock Movement Request
+- **Endpoint**: `/stock/selectStockItems`
+- **Request Body**: 
+  ```json
+  {"tin":"P052248771P","bhfId":"00","lastReqDt":"20241211113233"}
+  ```
+- **Response**:
+  - **Status Code**: 200
+  - **Result Code**: 001
+  - **Result Message**: "There is no search result"
+  - **Result Date**: 20241211113031
+  - **Data**: null
+
+### Summary
+- **Total Requests**: 23
+- **Successful Requests**: 23
+- **Failed Requests**: 0
+
+This summary includes all the requests, their responses, and any errors encountered during the data synchronization process.
