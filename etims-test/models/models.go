@@ -252,48 +252,48 @@ func (r StockRequest) Validate() error {
 // SalesRequest for managing sales
 type SalesRequest struct {
 	BaseRequest
-	InvcNo      string      `json:"invcNo"`
-	OrgInvcNo   string      `json:"orgInvcNo"`
-	CustTin     string      `json:"custTin"`
-	CustNm      string      `json:"custNm"`
-	SalesTyCd   string      `json:"salesTyCd"`
-	RcptTyCd    string      `json:"rcptTyCd"`
-	PmtTyCd     string      `json:"pmtTyCd"`
-	SalesSttsCd string      `json:"salesSttsCd"`
-	CfmDt       string      `json:"cfmDt"`
-	SalesDt     string      `json:"salesDt"`
-	StockRlsDt  string      `json:"stockRlsDt"`
-	CnclReqDt   string      `json:"cnclReqDt"`
-	CnclDt      string      `json:"cnclDt"`
-	RfdDt       string      `json:"rfdDt"`
-	RfdRsnCd    string      `json:"rfdRsnCd"`
-	TotItemCnt  int         `json:"totItemCnt"`
-	TaxblAmtA   float64     `json:"taxblAmtA"`
-	TaxblAmtB   float64     `json:"taxblAmtB"`
-	TaxblAmtC   float64     `json:"taxblAmtC"`
-	TaxblAmtD   float64     `json:"taxblAmtD"`
-	TaxblAmtE   float64     `json:"taxblAmtE"`
-	TaxRtA      float64     `json:"taxRtA"`
-	TaxRtB      float64     `json:"taxRtB"`
-	TaxRtC      float64     `json:"taxRtC"`
-	TaxRtD      float64     `json:"taxRtD"`
-	TaxRtE      float64     `json:"taxRtE"`
-	TaxAmtA     float64     `json:"taxAmtA"`
-	TaxAmtB     float64     `json:"taxAmtB"`
-	TaxAmtC     float64     `json:"taxAmtC"`
-	TaxAmtD     float64     `json:"taxAmtD"`
-	TaxAmtE     float64     `json:"taxAmtE"`
-	TotTaxblAmt float64     `json:"totTaxblAmt"`
-	TotTaxAmt   float64     `json:"totTaxAmt"`
-	TotAmt      float64     `json:"totAmt"`
-	PrchrAcptcYn string     `json:"prchrAcptcYn"`
-	Remark      string      `json:"remark"`
-	RegrId      string      `json:"regrId"`
-	RegrNm      string      `json:"regrNm"`
-	ModrId      string      `json:"modrId"`
-	ModrNm      string      `json:"modrNm"`
-	Receipt     Receipt     `json:"receipt"`
-	ItemList    []SalesItem `json:"itemList"`
+	InvcNo       string      `json:"invcNo"`
+	OrgInvcNo    string      `json:"orgInvcNo"`
+	CustTin      string      `json:"custTin"`
+	CustNm       string      `json:"custNm"`
+	SalesTyCd    string      `json:"salesTyCd"`
+	RcptTyCd     string      `json:"rcptTyCd"`
+	PmtTyCd      string      `json:"pmtTyCd"`
+	SalesSttsCd  string      `json:"salesSttsCd"`
+	CfmDt        string      `json:"cfmDt"`
+	SalesDt      string      `json:"salesDt"`
+	StockRlsDt   string      `json:"stockRlsDt"`
+	CnclReqDt    string      `json:"cnclReqDt"`
+	CnclDt       string      `json:"cnclDt"`
+	RfdDt        string      `json:"rfdDt"`
+	RfdRsnCd     string      `json:"rfdRsnCd"`
+	TotItemCnt   int         `json:"totItemCnt"`
+	TaxblAmtA    float64     `json:"taxblAmtA"`
+	TaxblAmtB    float64     `json:"taxblAmtB"`
+	TaxblAmtC    float64     `json:"taxblAmtC"`
+	TaxblAmtD    float64     `json:"taxblAmtD"`
+	TaxblAmtE    float64     `json:"taxblAmtE"`
+	TaxRtA       float64     `json:"taxRtA"`
+	TaxRtB       float64     `json:"taxRtB"`
+	TaxRtC       float64     `json:"taxRtC"`
+	TaxRtD       float64     `json:"taxRtD"`
+	TaxRtE       float64     `json:"taxRtE"`
+	TaxAmtA      float64     `json:"taxAmtA"`
+	TaxAmtB      float64     `json:"taxAmtB"`
+	TaxAmtC      float64     `json:"taxAmtC"`
+	TaxAmtD      float64     `json:"taxAmtD"`
+	TaxAmtE      float64     `json:"taxAmtE"`
+	TotTaxblAmt  float64     `json:"totTaxblAmt"`
+	TotTaxAmt    float64     `json:"totTaxAmt"`
+	TotAmt       float64     `json:"totAmt"`
+	PrchrAcptcYn string      `json:"prchrAcptcYn"`
+	Remark       string      `json:"remark"`
+	RegrId       string      `json:"regrId"`
+	RegrNm       string      `json:"regrNm"`
+	ModrId       string      `json:"modrId"`
+	ModrNm       string      `json:"modrNm"`
+	Receipt      Receipt     `json:"receipt"`
+	ItemList     []SalesItem `json:"itemList"`
 }
 
 type Receipt struct {
@@ -308,27 +308,27 @@ type Receipt struct {
 }
 
 type SalesItem struct {
-	ItemSeq    int     `json:"itemSeq"`
-	ItemCd     string  `json:"itemCd"`
-	ItemClsCd  string  `json:"itemClsCd"`
-	ItemNm     string  `json:"itemNm"`
-	Bcd        string  `json:"bcd"`
-	PkgUnitCd  string  `json:"pkgUnitCd"`
-	Pkg        int     `json:"pkg"`
-	QtyUnitCd  string  `json:"qtyUnitCd"`
-	Qty        int     `json:"qty"`
-	Prc        float64 `json:"prc"`
-	SplyAmt    float64 `json:"splyAmt"`
-	DcRt       float64 `json:"dcRt"`
-	DcAmt      float64 `json:"dcAmt"`
-	IsrccCd    string  `json:"isrccCd"`
-	IsrccNm    string  `json:"isrccNm"`
-	IsrcRt     float64 `json:"isrcRt"`
-	IsrcAmt    float64 `json:"isrcAmt"`
-	TaxTyCd    string  `json:"taxTyCd"`
-	TaxblAmt   float64 `json:"taxblAmt"`
-	TaxAmt     float64 `json:"taxAmt"`
-	TotAmt     float64 `json:"totAmt"`
+	ItemSeq   int     `json:"itemSeq"`
+	ItemCd    string  `json:"itemCd"`
+	ItemClsCd string  `json:"itemClsCd"`
+	ItemNm    string  `json:"itemNm"`
+	Bcd       string  `json:"bcd"`
+	PkgUnitCd string  `json:"pkgUnitCd"`
+	Pkg       int     `json:"pkg"`
+	QtyUnitCd string  `json:"qtyUnitCd"`
+	Qty       int     `json:"qty"`
+	Prc       float64 `json:"prc"`
+	SplyAmt   float64 `json:"splyAmt"`
+	DcRt      float64 `json:"dcRt"`
+	DcAmt     float64 `json:"dcAmt"`
+	IsrccCd   string  `json:"isrccCd"`
+	IsrccNm   string  `json:"isrccNm"`
+	IsrcRt    float64 `json:"isrcRt"`
+	IsrcAmt   float64 `json:"isrcAmt"`
+	TaxTyCd   string  `json:"taxTyCd"`
+	TaxblAmt  float64 `json:"taxblAmt"`
+	TaxAmt    float64 `json:"taxAmt"`
+	TotAmt    float64 `json:"totAmt"`
 }
 
 func (r SalesRequest) Validate() error {
@@ -356,11 +356,17 @@ func (r SalesRequest) Validate() error {
 	return nil
 }
 
-// InitRequest represents a device initialization request
-type InitRequest struct {
+type CodeListRequest struct {
 	Tin       string `json:"tin"`
 	BhfId     string `json:"bhfId"`
-	DvcSrlNo  string `json:"dvcSrlNo"`  // Device Serial Number
+	LastReqDt string `json:"lastReqDt"`
+}
+
+// InitRequest represents a device initialization request
+type InitRequest struct {
+	Tin      string `json:"tin"`
+	BhfId    string `json:"bhfId"`
+	DvcSrlNo string `json:"dvcSrlNo"` // Device Serial Number
 }
 
 // BranchListRequest represents a request to get branch list
@@ -381,14 +387,14 @@ type NoticeRequest struct {
 type ItemCompositionRequest struct {
 	Tin       string `json:"tin"`
 	BhfId     string `json:"bhfId"`
-	TaskCd    string `json:"taskCd"`     // Task Code
-	ItemCd    string `json:"itemCd"`     // Item Code
-	ItemClsCd string `json:"itemClsCd"`  // Item Classification Code
-	HsCd      string `json:"hsCd"`       // HS Code
-	ItemSeq   int    `json:"itemSeq"`    // Item Sequence
+	TaskCd    string `json:"taskCd"`    // Task Code
+	ItemCd    string `json:"itemCd"`    // Item Code
+	ItemClsCd string `json:"itemClsCd"` // Item Classification Code
+	HsCd      string `json:"hsCd"`      // HS Code
+	ItemSeq   int    `json:"itemSeq"`   // Item Sequence
 	Remark    string `json:"remark,omitempty"`
-	ModrNm    string `json:"modrNm"`     // Modifier Name
-	ModrId    string `json:"modrId"`     // Modifier ID
+	ModrNm    string `json:"modrNm"` // Modifier Name
+	ModrId    string `json:"modrId"` // Modifier ID
 }
 
 // ImportedItemRequest represents a request to get imported items
@@ -400,27 +406,27 @@ type ImportedItemRequest struct {
 
 // ImportedItemSaveRequest represents a request to save imported items
 type ImportedItemSaveRequest struct {
-	Tin             string `json:"tin"`
-	BhfId           string `json:"bhfId"`
-	TaskCd          string `json:"taskCd"`          // Task Code
-	DclDe           string `json:"dclDe"`           // Declaration Date
-	ItemSeq         int    `json:"itemSeq"`         // Item Sequence
-	HsCd            string `json:"hsCd"`            // HS Code
-	ItemClsCd       string `json:"itemClsCd"`       // Item Classification Code
-	ItemCd          string `json:"itemCd"`          // Item Code
-	ImptItemSttsCd  string `json:"imptItemSttsCd"`  // Import Item Status Code
-	Remark          string `json:"remark,omitempty"`
-	ModrNm          string `json:"modrNm"`          // Modifier Name
-	ModrId          string `json:"modrId"`          // Modifier ID
+	Tin            string `json:"tin"`
+	BhfId          string `json:"bhfId"`
+	TaskCd         string `json:"taskCd"`         // Task Code
+	DclDe          string `json:"dclDe"`          // Declaration Date
+	ItemSeq        int    `json:"itemSeq"`        // Item Sequence
+	HsCd           string `json:"hsCd"`           // HS Code
+	ItemClsCd      string `json:"itemClsCd"`      // Item Classification Code
+	ItemCd         string `json:"itemCd"`         // Item Code
+	ImptItemSttsCd string `json:"imptItemSttsCd"` // Import Item Status Code
+	Remark         string `json:"remark,omitempty"`
+	ModrNm         string `json:"modrNm"` // Modifier Name
+	ModrId         string `json:"modrId"` // Modifier ID
 }
 
 // PurchaseConfirmationRequest represents a request to confirm purchase transactions
 type PurchaseConfirmationRequest struct {
-	Tin           string `json:"tin"`
-	BhfId         string `json:"bhfId"`
-	PurchaseNo    string `json:"purchaseNo"`    // Purchase Number
-	ConfirmDt     string `json:"confirmDt"`     // Confirmation Date
-	Remark        string `json:"remark,omitempty"`
-	ModrNm        string `json:"modrNm"`        // Modifier Name
-	ModrId        string `json:"modrId"`        // Modifier ID
+	Tin        string `json:"tin"`
+	BhfId      string `json:"bhfId"`
+	PurchaseNo string `json:"purchaseNo"` // Purchase Number
+	ConfirmDt  string `json:"confirmDt"`  // Confirmation Date
+	Remark     string `json:"remark,omitempty"`
+	ModrNm     string `json:"modrNm"` // Modifier Name
+	ModrId     string `json:"modrId"` // Modifier ID
 }

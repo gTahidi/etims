@@ -43,7 +43,17 @@ func NewVSCUClient(baseURL, tin, bhfId, cmcKey string, logger *logrus.Logger) *V
 		CmcKey:   cmcKey,
 		DvcSrlNo: "7ba05e23-850a-44dd-b09a-2eac8405e592",
 		Logger:   logger,
-		Client:   &http.Client{Timeout: 30 * time.Second},
+		Client: &http.Client{
+			Timeout: time.Second * 480,
+			Transport: &http.Transport{
+				MaxIdleConns:          100,
+				MaxIdleConnsPerHost:   100,
+				IdleConnTimeout:       90 * time.Second,
+				Proxy:                 http.ProxyFromEnvironment,
+				TLSHandshakeTimeout:   10 * time.Second,
+				ExpectContinueTimeout: 1 * time.Second,
+			},
+		},
 	}
 }
 
@@ -126,14 +136,27 @@ func (c *VSCUClient) SendRequest(method, endpoint string, requestBody interface{
 
 // Code List Endpoint
 func (c *VSCUClient) GetCodeList(lastReqDt string) (*models.APIResponse, error) {
-	req := models.CodeRequest{
-		BaseRequest: models.BaseRequest{
-			Tin:   c.Tin,
-			BhfId: c.BhfId,
-		},
+	resp, err := c.SendRequest("POST", "/code/selectCodes", models.CodeListRequest{
+		Tin:       c.Tin,
+		BhfId:     c.BhfId,
 		LastReqDt: lastReqDt,
+	}, nil)
+	if err != nil {
+		return nil, err
 	}
-	return c.SendRequest("POST", "/code/selectCodes", req, nil)
+
+	// Handle 001 case
+	if resp.ResultCd == "001" {
+		c.Logger.Info("No code list found")
+		return resp, nil
+	}
+
+	// Handle other non-success cases
+	if resp.ResultCd != "000" {
+		return nil, fmt.Errorf("API error: %s (code: %s)", resp.ResultMsg, resp.ResultCd)
+	}
+
+	return resp, nil
 }
 
 // Item Classification List Endpoint
