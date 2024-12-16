@@ -114,7 +114,7 @@ func (c *VSCUClient) SendRequest(method, endpoint string, requestBody interface{
 	}
 
 	// Check for API-level errors
-	if apiResponse.ResultCd != "000" {
+	if apiResponse.ResultCd != "000" && apiResponse.ResultCd != "902" {
 		return &apiResponse, &APIError{
 			Code:    apiResponse.ResultCd,
 			Message: apiResponse.ResultMsg,
