@@ -31,9 +31,19 @@ type ItemClassRequest struct {
 }
 
 type CustomerRequest struct {
-	Tin      string `json:"tin"`
-	BhfId    string `json:"bhfId"`
-	CustmTin string `json:"custmTin"`
+	Tin       string `json:"tin"`
+	BhfId     string `json:"bhfId"`
+	CustTin   string `json:"custTin"`
+	CustNm    string `json:"custNm"`
+	Adrs      string `json:"adrs"`
+	TelNo     string `json:"telNo"`
+	Email     string `json:"email"`
+	UseYn     string `json:"useYn"`
+	Remark    string `json:"remark"`
+	RegrId    string `json:"regrId"`
+	RegrNm    string `json:"regrNm"`
+	ModrId    string `json:"modrId"`
+	ModrNm    string `json:"modrNm"`
 }
 
 type BranchCustomerRequest struct {
@@ -42,11 +52,15 @@ type BranchCustomerRequest struct {
 	CustNo  string `json:"custNo"`
 	CustTin string `json:"custTin"`
 	CustNm  string `json:"custNm"`
+	Adrs    string `json:"adrs"`
+	TelNo   string `json:"telNo"`
+	Email   string `json:"email"`
 	UseYn   string `json:"useYn"`
-	RegrNm  string `json:"regrNm"`
+	Remark  string `json:"remark"`
 	RegrId  string `json:"regrId"`
-	ModrNm  string `json:"modrNm"`
+	RegrNm  string `json:"regrNm"`
 	ModrId  string `json:"modrId"`
+	ModrNm  string `json:"modrNm"`
 }
 
 type BranchInsuranceRequest struct {
@@ -56,32 +70,33 @@ type BranchInsuranceRequest struct {
 	IsrccNm string  `json:"isrccNm"`
 	IsrcRt  float64 `json:"isrcRt"`
 	UseYn   string  `json:"useYn"`
-	RegrNm  string  `json:"regrNm"`
+	Remark  string  `json:"remark"`
 	RegrId  string  `json:"regrId"`
-	ModrNm  string  `json:"modrNm"`
+	RegrNm  string  `json:"regrNm"`
 	ModrId  string  `json:"modrId"`
+	ModrNm  string  `json:"modrNm"`
 }
 
 type ItemRequest struct {
-	Tin        string  `json:"tin"`
-	BhfId      string  `json:"bhfId"`
-	ItemCd     string  `json:"itemCd"`
-	ItemClsCd  string  `json:"itemClsCd"`
-	ItemTyCd   string  `json:"itemTyCd"`
-	ItemNm     string  `json:"itemNm"`
-	ItemStdNm  string  `json:"itemStdNm"`
-	OrgnNatCd  string  `json:"orgnNatCd"`
-	PkgUnitCd  string  `json:"pkgUnitCd"`
-	QtyUnitCd  string  `json:"qtyUnitCd"`
-	TaxTyCd    string  `json:"taxTyCd"`
-	BtchNo     string  `json:"btchNo"`
-	DftPrc     float64 `json:"dftPrc"`
+	Tin         string  `json:"tin"`
+	BhfId       string  `json:"bhfId"`
+	ItemCd      string  `json:"itemCd"`
+	ItemClsCd   string  `json:"itemClsCd"`
+	ItemTyCd    string  `json:"itemTyCd"`
+	ItemNm      string  `json:"itemNm"`
+	ItemStdNm   string  `json:"itemStdNm"`
+	OrgnNatCd   string  `json:"orgnNatCd"`
+	PkgUnitCd   string  `json:"pkgUnitCd"`
+	QtyUnitCd   string  `json:"qtyUnitCd"`
+	TaxTyCd     string  `json:"taxTyCd"`
+	BtchNo      string  `json:"btchNo"`
+	DftPrc      float64 `json:"dftPrc"`
 	IsrcAplcbYn string  `json:"isrcAplcbYn"`
-	UseYn      string  `json:"useYn"`
-	RegrNm     string  `json:"regrNm"`
-	RegrId     string  `json:"regrId"`
-	ModrNm     string  `json:"modrNm"`
-	ModrId     string  `json:"modrId"`
+	UseYn       string  `json:"useYn"`
+	RegrNm      string  `json:"regrNm"`
+	RegrId      string  `json:"regrId"`
+	ModrNm      string  `json:"modrNm"`
+	ModrId      string  `json:"modrId"`
 }
 
 type StockMasterRequest struct {
@@ -218,40 +233,50 @@ type BranchCustomerInfoRequest struct {
 }
 
 type SalesTransactionRequest struct {
-	Tin         string     `json:"tin"`
-	BhfId       string     `json:"bhfId"`
-	SalesTyCd   string     `json:"salesTyCd"`
-	RcptTyCd    string     `json:"rcptTyCd"`
-	CustTin     string     `json:"custTin"`
-	CustNm      string     `json:"custNm"`
-	CustBhfId   string     `json:"custBhfId"`
-	SalesSttsCd string     `json:"salesSttsCd"`
-	CfmDt       string     `json:"cfmDt"`
-	SaleItems   []SaleItem `json:"saleItems"`
-	TotItemCnt  int        `json:"totItemCnt"`
-	TaxblAmtA   float64    `json:"taxblAmtA"`
-	TaxblAmtB   float64    `json:"taxblAmtB"`
-	TaxblAmtC   float64    `json:"taxblAmtC"`
-	TaxblAmtD   float64    `json:"taxblAmtD"`
-	TaxblAmtE   float64    `json:"taxblAmtE"`
-	TaxRtA      float64    `json:"taxRtA"`
-	TaxRtB      float64    `json:"taxRtB"`
-	TaxRtC      float64    `json:"taxRtC"`
-	TaxRtD      float64    `json:"taxRtD"`
-	TaxRtE      float64    `json:"taxRtE"`
-	TaxAmtA     float64    `json:"taxAmtA"`
-	TaxAmtB     float64    `json:"taxAmtB"`
-	TaxAmtC     float64    `json:"taxAmtC"`
-	TaxAmtD     float64    `json:"taxAmtD"`
-	TaxAmtE     float64    `json:"taxAmtE"`
-	TotTaxblAmt float64    `json:"totTaxblAmt"`
-	TotTaxAmt   float64    `json:"totTaxAmt"`
-	TotAmt      float64    `json:"totAmt"`
-	PmtTyCd     string     `json:"pmtTyCd"`
-	RegrId      string     `json:"regrId"`
-	RegrNm      string     `json:"regrNm"`
-	ModrId      string     `json:"modrId"`
-	ModrNm      string     `json:"modrNm"`
+	Tin         string      `json:"tin"`
+	BhfId       string      `json:"bhfId"`
+	InvcNo      string      `json:"invcNo"`
+	OrgInvcNo   string      `json:"orgInvcNo"`
+	CustTin     string      `json:"custTin"`
+	CustNm      string      `json:"custNm"`
+	SalesTyCd   string      `json:"salesTyCd"`
+	RcptTyCd    string      `json:"rcptTyCd"`
+	PmtTyCd     string      `json:"pmtTyCd"`
+	SalesSttsCd string      `json:"salesSttsCd"`
+	CfmDt       string      `json:"cfmDt"`
+	SalesDt     string      `json:"salesDt"`
+	StockRlsDt  string      `json:"stockRlsDt"`
+	CnclReqDt   string      `json:"cnclReqDt"`
+	CnclDt      string      `json:"cnclDt"`
+	RfdDt       string      `json:"rfdDt"`
+	RfdRsnCd    string      `json:"rfdRsnCd"`
+	TotItemCnt  int         `json:"totItemCnt"`
+	TaxblAmtA   float64     `json:"taxblAmtA"`
+	TaxblAmtB   float64     `json:"taxblAmtB"`
+	TaxblAmtC   float64     `json:"taxblAmtC"`
+	TaxblAmtD   float64     `json:"taxblAmtD"`
+	TaxblAmtE   float64     `json:"taxblAmtE"`
+	TaxRtA      float64     `json:"taxRtA"`
+	TaxRtB      float64     `json:"taxRtB"`
+	TaxRtC      float64     `json:"taxRtC"`
+	TaxRtD      float64     `json:"taxRtD"`
+	TaxRtE      float64     `json:"taxRtE"`
+	TaxAmtA     float64     `json:"taxAmtA"`
+	TaxAmtB     float64     `json:"taxAmtB"`
+	TaxAmtC     float64     `json:"taxAmtC"`
+	TaxAmtD     float64     `json:"taxAmtD"`
+	TaxAmtE     float64     `json:"taxAmtE"`
+	TotTaxblAmt float64     `json:"totTaxblAmt"`
+	TotTaxAmt   float64     `json:"totTaxAmt"`
+	TotAmt      float64     `json:"totAmt"`
+	PrchrAcptcYn string     `json:"prchrAcptcYn"`
+	Remark      string      `json:"remark"`
+	RegrId      string      `json:"regrId"`
+	RegrNm      string      `json:"regrNm"`
+	ModrId      string      `json:"modrId"`
+	ModrNm      string      `json:"modrNm"`
+	Receipt     Receipt     `json:"receipt"`
+	ItemList    []SaleItem  `json:"itemList"`
 }
 
 type StockMovementRequest struct {
@@ -275,16 +300,16 @@ type BranchUserRequest struct {
 }
 
 type ItemCompositionRequest struct {
-	Tin           string  `json:"tin"`
-	BhfId         string  `json:"bhfId"`
-	ItemCd        string  `json:"itemCd"`
-	CpstItemCd    string  `json:"cpstItemCd"`
-	CpstQty       float64 `json:"cpstQty"`
-	CpstUnitCd    string  `json:"cpstUnitCd"`
-	RegrId        string  `json:"regrId"`
-	RegrNm        string  `json:"regrNm"`
-	ModrId        string  `json:"modrId"`
-	ModrNm        string  `json:"modrNm"`
+	Tin        string  `json:"tin"`
+	BhfId      string  `json:"bhfId"`
+	ItemCd     string  `json:"itemCd"`
+	CpstItemCd string  `json:"cpstItemCd"`
+	CpstQty    float64 `json:"cpstQty"`
+	CpstUnitCd string  `json:"cpstUnitCd"`
+	RegrId     string  `json:"regrId"`
+	RegrNm     string  `json:"regrNm"`
+	ModrId     string  `json:"modrId"`
+	ModrNm     string  `json:"modrNm"`
 }
 
 type StockInOutRequest struct {
@@ -299,15 +324,14 @@ type StockInOutRequest struct {
 }
 
 type StockItem struct {
+	ItemSeq    int     `json:"itemSeq"`
 	ItemCd     string  `json:"itemCd"`
 	ItemClsCd  string  `json:"itemClsCd"`
 	ItemNm     string  `json:"itemNm"`
-	PkgUnitCd  string  `json:"pkgUnitCd"`
-	QtyUnitCd  string  `json:"qtyUnitCd"`
-	TaxTyCd    string  `json:"taxTyCd"`
 	Bcd        string  `json:"bcd"`
-	RegBhfId   string  `json:"regBhfId"`
+	PkgUnitCd  string  `json:"pkgUnitCd"`
 	Pkg        int     `json:"pkg"`
+	QtyUnitCd  string  `json:"qtyUnitCd"`
 	Qty        int     `json:"qty"`
 	DcRt       float64 `json:"dcRt"`
 	SupplrTin  string  `json:"supplrTin"`
@@ -326,17 +350,23 @@ type SaleItem struct {
 	ItemCd     string  `json:"itemCd"`
 	ItemClsCd  string  `json:"itemClsCd"`
 	ItemNm     string  `json:"itemNm"`
+	Bcd        string  `json:"bcd"`
 	PkgUnitCd  string  `json:"pkgUnitCd"`
-	QtyUnitCd  string  `json:"qtyUnitCd"`
 	Pkg        int     `json:"pkg"`
+	QtyUnitCd  string  `json:"qtyUnitCd"`
 	Qty        int     `json:"qty"`
-	PrcAmt     float64 `json:"prcAmt"`
+	Prc        float64 `json:"prc"`
+	SplyAmt    float64 `json:"splyAmt"`
 	DcRt       float64 `json:"dcRt"`
 	DcAmt      float64 `json:"dcAmt"`
+	IsrccCd    string  `json:"isrccCd"`
+	IsrccNm    string  `json:"isrccNm"`
+	IsrcRt     float64 `json:"isrcRt"`
+	IsrcAmt    float64 `json:"isrcAmt"`
 	TaxTyCd    string  `json:"taxTyCd"`
+	TaxblAmt   float64 `json:"taxblAmt"`
 	TaxAmt     float64 `json:"taxAmt"`
 	TotAmt     float64 `json:"totAmt"`
-	ItemExprDt string  `json:"itemExprDt"`
 }
 
 type GetItemRequest struct {
@@ -438,8 +468,8 @@ func main() {
 	response, err := sendRequest(baseURL+"/initializer/selectInitInfo", map[string]string{
 		"Content-Type": "application/json; charset=utf-8",
 		"Accept":       "application/json",
-		"CMC-KEY":     cmcKey,
-		"User-Agent":  "etims-client/1.0",
+		"CMC-KEY":      cmcKey,
+		"User-Agent":   "etims-client/1.0",
 	}, initRequestBody)
 	if err != nil {
 		logger.WithError(err).Fatal("Failed to send initialization request")
@@ -453,8 +483,8 @@ func main() {
 
 	// Log response details
 	logger.WithFields(logrus.Fields{
-		"statusCode":    response.StatusCode,
-		"headers":       response.Header,
+		"statusCode":   response.StatusCode,
+		"headers":      response.Header,
 		"responseBody": string(body),
 		"contentType":  response.Header.Get("Content-Type"),
 	}).Info("Received initialization response")
@@ -462,7 +492,7 @@ func main() {
 	if response.StatusCode != http.StatusOK {
 		logger.WithFields(logrus.Fields{
 			"statusCode": response.StatusCode,
-			"body":      string(body),
+			"body":       string(body),
 		}).Fatal("Initialization request failed")
 	}
 
@@ -590,7 +620,17 @@ func main() {
 	customerRequest := CustomerRequest{
 		Tin:      tin,
 		BhfId:    bhfId,
-		CustmTin: "A123456789Z", // Must be between 9-15 characters
+		CustTin:  "A123456789Z", // Must be between 9-15 characters
+		CustNm:   "Test Customer",
+		Adrs:     "Test Address",
+		TelNo:    "1234567890",
+		Email:    "test@example.com",
+		UseYn:    "Y",
+		Remark:   "",
+		RegrId:   "Admin",
+		RegrNm:   "Admin",
+		ModrId:   "Admin",
+		ModrNm:   "Admin",
 	}
 
 	customerRequestBody, err := json.Marshal(customerRequest)
@@ -609,11 +649,15 @@ func main() {
 		CustNo:  "CUST001",
 		CustTin: "A123456789Z",
 		CustNm:  "Test Customer",
+		Adrs:    "Test Address",
+		TelNo:   "1234567890",
+		Email:   "test@example.com",
 		UseYn:   "Y",
-		RegrNm:  "Admin",
+		Remark:  "",
 		RegrId:  "Admin",
-		ModrNm:  "Admin",
+		RegrNm:  "Admin",
 		ModrId:  "Admin",
+		ModrNm:  "Admin",
 	}
 
 	branchCustomerRequestBody, err := json.Marshal(branchCustomerRequest)
@@ -673,10 +717,11 @@ func main() {
 		IsrccNm: "Sample Insurance",
 		IsrcRt:  16.0,
 		UseYn:   "Y",
-		RegrNm:  "Admin",
+		Remark:  "",
 		RegrId:  "Admin",
-		ModrNm:  "Admin",
+		RegrNm:  "Admin",
 		ModrId:  "Admin",
+		ModrNm:  "Admin",
 	}
 
 	branchInsuranceRequestBody, err := json.Marshal(branchInsuranceRequest)
@@ -688,57 +733,251 @@ func main() {
 		logger.WithError(err).Fatal("Failed to send branch insurance")
 	}
 
-	// 13. Save Item
-	itemRequest := ItemRequest{
-		Tin:         tin,
-		BhfId:       bhfId,
-		ItemCd:      "KE1NTXU0000007",
-		ItemClsCd:   "5022110801",
-		ItemTyCd:    "1",
-		ItemNm:      "Test Item",
-		ItemStdNm:   "Standard Item",
-		OrgnNatCd:   "KE",
-		PkgUnitCd:   "NT",
-		QtyUnitCd:   "U",
-		TaxTyCd:     "B",
-		BtchNo:      "",
-		DftPrc:      1000.00,
-		IsrcAplcbYn: "N",
-		UseYn:       "Y",
-		RegrNm:      "Admin",
-		RegrId:      "Admin",
-		ModrNm:      "Admin",
-		ModrId:      "Admin",
+	// 13. Save Fuel Items
+	fuelItems := []ItemRequest{
+		{
+			Tin:         tin,
+			BhfId:       bhfId,
+			ItemCd:      "KE1NTXU0000101",
+			ItemClsCd:   "15101502", // Kerosene
+			ItemTyCd:    "1",
+			ItemNm:      "Kerosene",
+			ItemStdNm:   "Standard Kerosene",
+			OrgnNatCd:   "KE",
+			PkgUnitCd:   "NT", // Changed from LT to NT
+			QtyUnitCd:   "U",
+			TaxTyCd:     "B",
+			BtchNo:      "FUEL001",
+			DftPrc:      150.75,
+			IsrcAplcbYn: "N",
+			UseYn:       "Y",
+			RegrNm:      "Admin",
+			RegrId:      "Admin",
+			ModrNm:      "Admin",
+			ModrId:      "Admin",
+		},
+		{
+			Tin:         tin,
+			BhfId:       bhfId,
+			ItemCd:      "KE1NTXU0000102",
+			ItemClsCd:   "15101503", // Naphtha
+			ItemTyCd:    "1",
+			ItemNm:      "Naphtha",
+			ItemStdNm:   "Standard Naphtha",
+			OrgnNatCd:   "KE",
+			PkgUnitCd:   "NT", // Changed from LT to NT
+			QtyUnitCd:   "U",
+			TaxTyCd:     "B",
+			BtchNo:      "FUEL002",
+			DftPrc:      160.50,
+			IsrcAplcbYn: "N",
+			UseYn:       "Y",
+			RegrNm:      "Admin",
+			RegrId:      "Admin",
+			ModrNm:      "Admin",
+			ModrId:      "Admin",
+		},
+		{
+			Tin:         tin,
+			BhfId:       bhfId,
+			ItemCd:      "KE1NTXU0000103",
+			ItemClsCd:   "15101504", // Aviation fuel
+			ItemTyCd:    "1",
+			ItemNm:      "Aviation Fuel",
+			ItemStdNm:   "Standard Aviation Fuel",
+			OrgnNatCd:   "KE",
+			PkgUnitCd:   "NT", // Changed from LT to NT
+			QtyUnitCd:   "U",
+			TaxTyCd:     "B",
+			BtchNo:      "FUEL003",
+			DftPrc:      200.00,
+			IsrcAplcbYn: "N",
+			UseYn:       "Y",
+			RegrNm:      "Admin",
+			RegrId:      "Admin",
+			ModrNm:      "Admin",
+			ModrId:      "Admin",
+		},
+		{
+			Tin:         tin,
+			BhfId:       bhfId,
+			ItemCd:      "KE1NTXU0000104",
+			ItemClsCd:   "15101505", // Diesel fuel
+			ItemTyCd:    "1",
+			ItemNm:      "Diesel Fuel",
+			ItemStdNm:   "Standard Diesel",
+			OrgnNatCd:   "KE",
+			PkgUnitCd:   "NT", // Changed from LT to NT
+			QtyUnitCd:   "U",
+			TaxTyCd:     "B",
+			BtchNo:      "FUEL004",
+			DftPrc:      180.50,
+			IsrcAplcbYn: "N",
+			UseYn:       "Y",
+			RegrNm:      "Admin",
+			RegrId:      "Admin",
+			ModrNm:      "Admin",
+			ModrId:      "Admin",
+		},
+		{
+			Tin:         tin,
+			BhfId:       bhfId,
+			ItemCd:      "KE1NTXU0000105",
+			ItemClsCd:   "15101506", // Gasoline/Petrol
+			ItemTyCd:    "1",
+			ItemNm:      "Gasoline",
+			ItemStdNm:   "Standard Gasoline",
+			OrgnNatCd:   "KE",
+			PkgUnitCd:   "NT", // Changed from LT to NT
+			QtyUnitCd:   "U",
+			TaxTyCd:     "B",
+			BtchNo:      "FUEL005",
+			DftPrc:      175.30,
+			IsrcAplcbYn: "N",
+			UseYn:       "Y",
+			RegrNm:      "Admin",
+			RegrId:      "Admin",
+			ModrNm:      "Admin",
+			ModrId:      "Admin",
+		},
+		{
+			Tin:         tin,
+			BhfId:       bhfId,
+			ItemCd:      "KE1NTXU0000106",
+			ItemClsCd:   "15101507", // Benzene
+			ItemTyCd:    "1",
+			ItemNm:      "Benzene",
+			ItemStdNm:   "Standard Benzene",
+			OrgnNatCd:   "KE",
+			PkgUnitCd:   "NT", // Changed from LT to NT
+			QtyUnitCd:   "U",
+			TaxTyCd:     "B",
+			BtchNo:      "FUEL006",
+			DftPrc:      190.25,
+			IsrcAplcbYn: "N",
+			UseYn:       "Y",
+			RegrNm:      "Admin",
+			RegrId:      "Admin",
+			ModrNm:      "Admin",
+			ModrId:      "Admin",
+		},
+		{
+			Tin:         tin,
+			BhfId:       bhfId,
+			ItemCd:      "KE1NTXU0000107",
+			ItemClsCd:   "15101508", // Crude oil
+			ItemTyCd:    "1",
+			ItemNm:      "Crude Oil",
+			ItemStdNm:   "Standard Crude Oil",
+			OrgnNatCd:   "KE",
+			PkgUnitCd:   "NT", // Changed from LT to NT
+			QtyUnitCd:   "U",
+			TaxTyCd:     "B",
+			BtchNo:      "FUEL007",
+			DftPrc:      145.80,
+			IsrcAplcbYn: "N",
+			UseYn:       "Y",
+			RegrNm:      "Admin",
+			RegrId:      "Admin",
+			ModrNm:      "Admin",
+			ModrId:      "Admin",
+		},
+		{
+			Tin:         tin,
+			BhfId:       bhfId,
+			ItemCd:      "KE1NTXU0000108",
+			ItemClsCd:   "15101509", // Marine fuel
+			ItemTyCd:    "1",
+			ItemNm:      "Marine Fuel",
+			ItemStdNm:   "Standard Marine Fuel",
+			OrgnNatCd:   "KE",
+			PkgUnitCd:   "NT", // Changed from LT to NT
+			QtyUnitCd:   "U",
+			TaxTyCd:     "B",
+			BtchNo:      "FUEL008",
+			DftPrc:      185.90,
+			IsrcAplcbYn: "N",
+			UseYn:       "Y",
+			RegrNm:      "Admin",
+			RegrId:      "Admin",
+			ModrNm:      "Admin",
+			ModrId:      "Admin",
+		},
+		{
+			Tin:         tin,
+			BhfId:       bhfId,
+			ItemCd:      "KE1NTXU0000109",
+			ItemClsCd:   "15101510", // Condensate
+			ItemTyCd:    "1",
+			ItemNm:      "Condensate",
+			ItemStdNm:   "Standard Condensate",
+			OrgnNatCd:   "KE",
+			PkgUnitCd:   "NT", // Changed from LT to NT
+			QtyUnitCd:   "U",
+			TaxTyCd:     "B",
+			BtchNo:      "FUEL009",
+			DftPrc:      170.40,
+			IsrcAplcbYn: "N",
+			UseYn:       "Y",
+			RegrNm:      "Admin",
+			RegrId:      "Admin",
+			ModrNm:      "Admin",
+			ModrId:      "Admin",
+		},
+		{
+			Tin:         tin,
+			BhfId:       bhfId,
+			ItemCd:      "KE1NTXU0000110",
+			ItemClsCd:   "15101513", // Diesel fuel off road
+			ItemTyCd:    "1",
+			ItemNm:      "Diesel Fuel Off Road",
+			ItemStdNm:   "Standard Off Road Diesel",
+			OrgnNatCd:   "KE",
+			PkgUnitCd:   "NT", // Changed from LT to NT
+			QtyUnitCd:   "U",
+			TaxTyCd:     "B",
+			BtchNo:      "FUEL010",
+			DftPrc:      175.60,
+			IsrcAplcbYn: "N",
+			UseYn:       "Y",
+			RegrNm:      "Admin",
+			RegrId:      "Admin",
+			ModrNm:      "Admin",
+			ModrId:      "Admin",
+		},
 	}
 
-	itemRequestBody, err := json.Marshal(itemRequest)
-	if err != nil {
-		logger.WithError(err).Fatal("Failed to marshal item request")
-	}
+	// Save each fuel item
+	for _, item := range fuelItems {
+		itemRequestBody, err := json.Marshal(item)
+		if err != nil {
+			logger.WithError(err).Fatal("Failed to marshal fuel item request")
+		}
 
-	if err := makeRequest("/items/saveItems", itemRequestBody, "item"); err != nil {
-		logger.WithError(err).Fatal("Failed to send item")
-	}
+		if err := makeRequest("/items/saveItems", itemRequestBody, "fuel item"); err != nil {
+			logger.WithError(err).Fatal("Failed to send fuel item")
+		}
 
-	// 14. Stock Master
-	stockMasterRequest := StockMasterRequest{
-		Tin:    tin,
-		BhfId:  bhfId,
-		ItemCd: "KE1NTXU0000007",
-		RsdQty: 100,
-		RegrId: "Admin",
-		RegrNm: "Admin",
-		ModrId: "Admin",
-		ModrNm: "Admin",
-	}
+		// Create stock master entry for each fuel item
+		stockMasterRequest := StockMasterRequest{
+			Tin:    tin,
+			BhfId:  bhfId,
+			ItemCd: item.ItemCd,
+			RsdQty: 1000, // Initial stock quantity
+			RegrId: "Admin",
+			RegrNm: "Admin",
+			ModrId: "Admin",
+			ModrNm: "Admin",
+		}
 
-	stockMasterRequestBody, err := json.Marshal(stockMasterRequest)
-	if err != nil {
-		logger.WithError(err).Fatal("Failed to marshal stock master request")
-	}
+		stockMasterRequestBody, err := json.Marshal(stockMasterRequest)
+		if err != nil {
+			logger.WithError(err).Fatal("Failed to marshal stock master request")
+		}
 
-	if err := makeRequest("/stockMaster/saveStockMaster", stockMasterRequestBody, "stock master"); err != nil {
-		logger.WithError(err).Fatal("Failed to send stock master")
+		if err := makeRequest("/stockMaster/saveStockMaster", stockMasterRequestBody, "stock master"); err != nil {
+			logger.WithError(err).Fatal("Failed to send stock master")
+		}
 	}
 
 	// Test Customer Information
@@ -763,9 +1002,13 @@ func main() {
 		Tin:     tin,
 		BhfId:   bhfId,
 		CustNo:  "CUST001",
-		CustTin: "A123456789B",
+		CustTin: "A123456789Z",
 		CustNm:  "Test Customer",
+		Adrs:    "Test Address",
+		TelNo:   "0700000000",
+		Email:   "test@test.com",
 		UseYn:   "Y",
+		Remark:  "",
 		RegrId:  "Admin",
 		RegrNm:  "Admin",
 		ModrId:  "Admin",
@@ -777,7 +1020,7 @@ func main() {
 		logger.WithError(err).Fatal("Failed to marshal branch customer request")
 	}
 
-	if err := makeRequest("/branches/saveBrancheCustomers", branchCustomerRequestBody, "branch customer"); err != nil {
+	if err = makeRequest("/branches/saveBrancheCustomers", branchCustomerRequestBody, "branch customer"); err != nil {
 		logger.WithError(err).Fatal("Failed to send branch customer")
 	}
 
@@ -787,7 +1030,7 @@ func main() {
 		BhfId:  bhfId,
 		UserId: "USER001",
 		UserNm: "Test User",
-		Pwd:    "password123",
+		Pwd:    "password",
 		RoleCd: "ADMIN",
 		UseYn:  "Y",
 		RegrId: "Admin",
@@ -801,7 +1044,7 @@ func main() {
 		logger.WithError(err).Fatal("Failed to marshal branch user request")
 	}
 
-	if err := makeRequest("/branches/saveBrancheUsers", branchUserRequestBody, "branch user account"); err != nil {
+	if err = makeRequest("/branches/saveBrancheUsers", branchUserRequestBody, "branch user account"); err != nil {
 		logger.WithError(err).Fatal("Failed to send branch user account")
 	}
 
@@ -824,32 +1067,31 @@ func main() {
 		logger.WithError(err).Fatal("Failed to marshal item composition request")
 	}
 
-	if err := makeRequest("/items/saveItemComposition", itemCompositionRequestBody, "item composition"); err != nil {
+	if err = makeRequest("/items/saveItemComposition", itemCompositionRequestBody, "item composition"); err != nil {
 		logger.WithError(err).Fatal("Failed to send item composition")
 	}
 
 	// Stock In/Out
 	stockInOutRequest := StockInOutRequest{
-		Tin:    tin,
-		BhfId:  bhfId,
+		Tin:   tin,
+		BhfId: bhfId,
 		StockItems: []StockItem{
 			{
+				ItemSeq:    1,
 				ItemCd:     "KE1NTXU0000007", // Using the item we created earlier
 				ItemClsCd:  "5022110801",
 				ItemNm:     "Test Item",
-				PkgUnitCd:  "NT",
-				QtyUnitCd:  "U",
-				TaxTyCd:    "B",
 				Bcd:        "",
-				RegBhfId:   bhfId,
+				PkgUnitCd:  "NT",
 				Pkg:        1,
+				QtyUnitCd:  "U",
 				Qty:        10,
 				DcRt:       0,
-				SupplrTin:  tin,           // Using our own TIN as supplier
-				PchsTyCd:   "NS",          // Changed to NS (Normal Stock)
-				OrgnNatCd:  "KE",          // Origin nation code
-				ItemExprDt: "20241231",    // Item expiry date
-				ItemSttsCd: "01",          // Item status code
+				SupplrTin:  tin,        // Using our own TIN as supplier
+				PchsTyCd:   "01",       // Changed to 01 for Normal Stock
+				OrgnNatCd:  "KE",       // Origin nation code
+				ItemExprDt: "20241231", // Item expiry date
+				ItemSttsCd: "01",       // Item status code
 				RegrId:     "Admin",
 				RegrNm:     "Admin",
 				ModrId:     "Admin",
@@ -868,7 +1110,7 @@ func main() {
 		logger.WithError(err).Fatal("Failed to marshal stock in/out request")
 	}
 
-	if err := makeRequest("/stock/saveStockItems", stockInOutRequestBody, "stock in/out"); err != nil {
+	if err = makeRequest("/stock/saveStockItems", stockInOutRequestBody, "stock in/out"); err != nil {
 		logger.WithError(err).Fatal("Failed to send stock in/out")
 	}
 
@@ -884,24 +1126,24 @@ func main() {
 		logger.WithError(err).Fatal("Failed to marshal item info request")
 	}
 
-	if err := makeRequest("/items/selectItems", itemInfoRequestBody, "item information"); err != nil {
+	if err = makeRequest("/items/selectItems", itemInfoRequestBody, "item information"); err != nil {
 		logger.WithError(err).Fatal("Failed to fetch item information")
 	}
 
 	// Send Converted Import Item Information
 	importUpdateRequest := struct {
-		Tin            string  `json:"tin"`
-		BhfId          string  `json:"bhfId"`
-		TaskCd         string  `json:"taskCd"`
-		DclDe          string  `json:"dclDe"`
-		ItemSeq        int     `json:"itemSeq"`
-		HsCd           string  `json:"hsCd"`
-		ItemClsCd      string  `json:"itemClsCd"`
-		ItemCd         string  `json:"itemCd"`
-		ImptItemSttsCd string  `json:"imptItemSttsCd"`
-		Remark         string  `json:"remark"`
-		ModrNm         string  `json:"modrNm"`
-		ModrId         string  `json:"modrId"`
+		Tin            string `json:"tin"`
+		BhfId          string `json:"bhfId"`
+		TaskCd         string `json:"taskCd"`
+		DclDe          string `json:"dclDe"`
+		ItemSeq        int    `json:"itemSeq"`
+		HsCd           string `json:"hsCd"`
+		ItemClsCd      string `json:"itemClsCd"`
+		ItemCd         string `json:"itemCd"`
+		ImptItemSttsCd string `json:"imptItemSttsCd"`
+		Remark         string `json:"remark"`
+		ModrNm         string `json:"modrNm"`
+		ModrId         string `json:"modrId"`
 	}{
 		Tin:            tin,
 		BhfId:          bhfId,
@@ -922,7 +1164,7 @@ func main() {
 		logger.WithError(err).Fatal("Failed to marshal import update request")
 	}
 
-	if err := makeRequest("/imports/updateImportItems", importUpdateRequestBody, "import update"); err != nil {
+	if err = makeRequest("/imports/updateImportItems", importUpdateRequestBody, "import update"); err != nil {
 		logger.WithError(err).Fatal("Failed to update import items")
 	}
 
@@ -930,35 +1172,19 @@ func main() {
 	salesTransactionRequest := SalesTransactionRequest{
 		Tin:         tin,
 		BhfId:       bhfId,
-		SalesTyCd:   "NS",        // Changed to NS (Normal Sale)
-		RcptTyCd:    "NR",        // Changed to NR (Normal Receipt)
-		CustTin:     tin,         // Using our own TIN as customer
+		InvcNo:      "1",
+		OrgInvcNo:   "0",
+		SalesTyCd:   "NS", // Changed to NS (Normal Sale)
+		RcptTyCd:    "NR", // Changed to NR (Normal Receipt)
+		CustTin:     tin,  // Using our own TIN as customer
 		CustNm:      "Test Customer",
-		CustBhfId:   bhfId,
-		SalesSttsCd: "02",        // 02: Completed
+		SalesSttsCd: "02",             // 02: Completed
 		CfmDt:       "20241211085127", // Current timestamp
-		SaleItems: []SaleItem{
-			{
-				ItemSeq:    1,
-				ItemCd:     "KE1NTXU0000007", // Using the item we created earlier
-				ItemClsCd:  "5022110801",
-				ItemNm:     "Test Item",
-				PkgUnitCd:  "NT",
-				QtyUnitCd:  "U",
-				Pkg:        1,
-				Qty:        1,
-				PrcAmt:     1000.00,
-				DcRt:       0,
-				DcAmt:      0,
-				TaxTyCd:    "B",
-				TaxAmt:     160.00,
-				TotAmt:     1160.00,
-				ItemExprDt: "20241231",
-			},
-		},
-		TotItemCnt:  1,
+		SalesDt:     "20231228",
+		StockRlsDt:  "20241211085127",
+		TotItemCnt:  2,
 		TaxblAmtA:   0,
-		TaxblAmtB:   1000.00,
+		TaxblAmtB:   250000,
 		TaxblAmtC:   0,
 		TaxblAmtD:   0,
 		TaxblAmtE:   0,
@@ -968,18 +1194,76 @@ func main() {
 		TaxRtD:      0,
 		TaxRtE:      0,
 		TaxAmtA:     0,
-		TaxAmtB:     160.00,
+		TaxAmtB:     94576,
 		TaxAmtC:     0,
 		TaxAmtD:     0,
 		TaxAmtE:     0,
-		TotTaxblAmt: 1000.00,
-		TotTaxAmt:   160.00,
-		TotAmt:      1160.00,
-		PmtTyCd:     "01",       // 01: Cash
+		TotTaxblAmt: 250000,
+		TotTaxAmt:   38135,
+		TotAmt:      250000,
+		PmtTyCd:     "01", // 01: Cash
 		RegrId:      "Admin",
 		RegrNm:      "Admin",
 		ModrId:      "Admin",
 		ModrNm:      "Admin",
+		Receipt: Receipt{
+			CustTin:      tin,
+			CustMblNo:    "",
+			RptNo:        1,
+			TrdeNm:       "Test Shop",
+			Adrs:         "Test Address",
+			TopMsg:       "Welcome",
+			BtmMsg:       "Thank you",
+			PrchrAcptcYn: "N",
+		},
+		ItemList: []SaleItem{
+			{
+				ItemSeq:   1,
+				ItemCd:    "KE1NTXU0000007",
+				ItemClsCd: "5022110801",
+				ItemNm:    "Test Item",
+				Bcd:       "",
+				PkgUnitCd: "NT",
+				Pkg:       1,
+				QtyUnitCd: "U",
+				Qty:       5,
+				Prc:       100.00,
+				SplyAmt:   500.00,
+				DcRt:      0,
+				DcAmt:     0,
+				IsrccCd:   "",
+				IsrccNm:   "",
+				IsrcRt:    0,
+				IsrcAmt:   0,
+				TaxTyCd:   "B",
+				TaxblAmt:  500.00,
+				TaxAmt:    80.00,
+				TotAmt:    580.00,
+			},
+			{
+				ItemSeq:   2,
+				ItemCd:    "KE1NTXU0000008",
+				ItemClsCd: "5022110801",
+				ItemNm:    "Test Item 2",
+				Bcd:       "",
+				PkgUnitCd: "NT",
+				Pkg:       1,
+				QtyUnitCd: "U",
+				Qty:       5,
+				Prc:       100.00,
+				SplyAmt:   500.00,
+				DcRt:      0,
+				DcAmt:     0,
+				IsrccCd:   "",
+				IsrccNm:   "",
+				IsrcRt:    0,
+				IsrcAmt:   0,
+				TaxTyCd:   "B",
+				TaxblAmt:  500.00,
+				TaxAmt:    80.00,
+				TotAmt:    580.00,
+			},
+		},
 	}
 
 	salesTransactionRequestBody, err := json.Marshal(salesTransactionRequest)
@@ -987,7 +1271,7 @@ func main() {
 		logger.WithError(err).Fatal("Failed to marshal sales transaction request")
 	}
 
-	if err := makeRequest("/trnsSales/saveSales", salesTransactionRequestBody, "sales transaction"); err != nil {
+	if err = makeRequest("/trnsSales/saveSales", salesTransactionRequestBody, "sales transaction"); err != nil {
 		logger.WithError(err).Fatal("Failed to send sales transaction")
 	}
 
@@ -1003,7 +1287,7 @@ func main() {
 		logger.WithError(err).Fatal("Failed to marshal stock movement request")
 	}
 
-	if err := makeRequest("/stock/selectStockItems", stockMovementRequestBody, "stock movement"); err != nil {
+	if err = makeRequest("/stock/selectStockItems", stockMovementRequestBody, "stock movement"); err != nil {
 		logger.WithError(err).Fatal("Failed to fetch stock movement")
 	}
 
@@ -1046,8 +1330,8 @@ func sendRequest(url string, headers map[string]string, requestBody []byte) (*ht
 
 	// Log request details
 	log.WithFields(logrus.Fields{
-		"body_size":     len(requestBody),
-		"body":          string(requestBody),
+		"body_size":       len(requestBody),
+		"body":            string(requestBody),
 		"request_headers": req.Header,
 	}).Info("Sending request")
 
@@ -1075,11 +1359,11 @@ func sendRequest(url string, headers map[string]string, requestBody []byte) (*ht
 
 	// Log response details
 	log.WithFields(logrus.Fields{
-		"status_code":       resp.StatusCode,
-		"duration_ms":       duration.Milliseconds(),
-		"content_length":    resp.ContentLength,
-		"response_headers":  resp.Header,
-		"content_type":      resp.Header.Get("Content-Type"),
+		"status_code":      resp.StatusCode,
+		"duration_ms":      duration.Milliseconds(),
+		"content_length":   resp.ContentLength,
+		"response_headers": resp.Header,
+		"content_type":     resp.Header.Get("Content-Type"),
 	}).Info("Received response")
 
 	return resp, nil

@@ -1,0 +1,17 @@
+{
+    "tin": "P052248771P",
+    "bhfId": "00",
+    "custNo": "CUST001",
+    "custTin": "A123456789Z",
+    "custNm": "Test Customer",
+    "adrs": "0100, Nairobi",
+    "telNo": "+254722000000",
+    "email": "mrkan@example.com",
+    "faxNo": "",
+    "useYn": "Y",
+    "remark": "",
+    "regrNm": "Admin",
+    "regrId": "Admin",
+    "modrNm": "Admin",
+    "modrId": "Admin"
+}

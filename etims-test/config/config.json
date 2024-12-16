@@ -1,0 +1,12 @@
+{
+    "api": {
+        "baseURL": "http://20.94.40.140:8088",
+        "tin": "P052248771P",
+        "bhfId": "00",
+        "cmcKey": "D3B478EDFBE54536B8DC9DA691A51440E6278C18104D4D6D904F"
+    },
+    "logging": {
+        "level": "info",
+        "format": "json"
+    }
+}
