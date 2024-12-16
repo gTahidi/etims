@@ -127,7 +127,7 @@ func main() {
 				logger.WithError(err).Error("Failed to parse sales request data")
 				return nil
 			}
-			
+
 			// Send sales request
 			resp, err := client.SaveSales(salesReq)
 			if err != nil {
@@ -138,14 +138,64 @@ func main() {
 			logger.WithField("response", resp).Info("Sales request successful")
 
 		case "stock.json":
-			var stockReq models.StockRequest
+			// Parse stock request
+			var stockReq struct {
+				Tin         string             `json:"tin"`
+				BhfId       string             `json:"bhfId"`
+				SarNo       int                `json:"sarNo"`
+				OrgSarNo    int                `json:"orgSarNo"`
+				RegTyCd     string             `json:"regTyCd"`
+				CustTin     string             `json:"custTin"`
+				CustNm      string             `json:"custNm"`
+				CustBhfId   string             `json:"custBhfId"`
+				SarTyCd     string             `json:"sarTyCd"`
+				OcrnDt      string             `json:"ocrnDt"`
+				StockRlsDt  string             `json:"stockRlsDt"`
+				TotItemCnt  int                `json:"totItemCnt"`
+				TotTaxblAmt float64            `json:"totTaxblAmt"`
+				TotTaxAmt   float64            `json:"totTaxAmt"`
+				TotAmt      float64            `json:"totAmt"`
+				Remark      string             `json:"remark"`
+				RegrId      string             `json:"regrId"`
+				RegrNm      string             `json:"regrNm"`
+				ModrId      string             `json:"modrId"`
+				ModrNm      string             `json:"modrNm"`
+				StockItems  []models.StockItem `json:"stockItems"`
+			}
 			if err := json.Unmarshal(data, &stockReq); err != nil {
 				logger.WithError(err).Error("Failed to parse stock request data")
 				return nil
 			}
 
+			// Create StockRequest with all fields
+			req := models.StockRequest{
+				BaseRequest: models.BaseRequest{
+					Tin:   stockReq.Tin,
+					BhfId: stockReq.BhfId,
+				},
+				SarNo:       stockReq.SarNo,
+				OrgSarNo:    stockReq.OrgSarNo,
+				RegTyCd:     stockReq.RegTyCd,
+				CustTin:     stockReq.CustTin,
+				CustNm:      stockReq.CustNm,
+				CustBhfId:   stockReq.CustBhfId,
+				SarTyCd:     stockReq.SarTyCd,
+				OcrnDt:      stockReq.OcrnDt,
+				StockRlsDt:  stockReq.StockRlsDt,
+				TotItemCnt:  stockReq.TotItemCnt,
+				TotTaxblAmt: stockReq.TotTaxblAmt,
+				TotTaxAmt:   stockReq.TotTaxAmt,
+				TotAmt:      stockReq.TotAmt,
+				Remark:      stockReq.Remark,
+				RegrId:      stockReq.RegrId,
+				RegrNm:      stockReq.RegrNm,
+				ModrId:      stockReq.ModrId,
+				ModrNm:      stockReq.ModrNm,
+				ItemList:    stockReq.StockItems,
+			}
+
 			// Send stock request
-			resp, err := client.SaveStock(stockReq)
+			resp, err := client.SaveStock(req)
 			if err != nil {
 				logger.WithError(err).Error("Failed to send stock request")
 				return nil
@@ -154,20 +204,30 @@ func main() {
 			logger.WithField("response", resp).Info("Stock request successful")
 
 		case "item.json":
-			var itemReq models.ItemRequest
-			if err := json.Unmarshal(data, &itemReq); err != nil {
-				logger.WithError(err).Error("Failed to parse item request data")
+			// Parse items list
+			var itemsList struct {
+				Tin   string               `json:"tin"`
+				BhfId string               `json:"bhfId"`
+				Items []models.ItemRequest `json:"items"`
+			}
+			if err := json.Unmarshal(data, &itemsList); err != nil {
+				logger.WithError(err).Error("Failed to parse items list")
 				return nil
 			}
 
-			// Send item request
-			resp, err := client.SaveItem(itemReq)
-			if err != nil {
-				logger.WithError(err).Error("Failed to send item request")
-				return nil
+			// Register each item individually
+			for _, item := range itemsList.Items {
+				// Send item request
+				resp, err := client.SaveItem(item)
+				if err != nil {
+					logger.WithError(err).Error("Failed to send item request")
+					continue
+				}
+				logger.WithFields(logrus.Fields{
+					"itemCd":   item.ItemCd,
+					"response": resp,
+				}).Info("Item registration successful")
 			}
-
-			logger.WithField("response", resp).Info("Item request successful")
 
 		case "branch_customer.json":
 			var custReq models.BranchCustomerRequest
@@ -198,11 +258,15 @@ func main() {
 func initializeAndSync(client *client.VSCUClient, logger *logrus.Logger) error {
 	// 1. Device initialization
 	logger.Info("Initializing device")
-	resp, err := client.InitializeDevice()
+	_, err := client.InitializeDevice()
 	if err != nil {
-		return fmt.Errorf("device initialization failed: %w", err)
+		// Check if error is APIError type and has code 902 (device already initialized)
+		if e, ok := err.(interface{ Code() string }); ok && e.Code() == "902" {
+			logger.Info("Device is already initialized, proceeding with sync")
+		} else {
+			return fmt.Errorf("device initialization failed: %w", err)
+		}
 	}
-	logger.WithField("response", resp).Info("Device initialization successful")
 
 	// Get current timestamp for sync
 	lastReqDt := client.GetCurrentTimestamp()
@@ -210,32 +274,74 @@ func initializeAndSync(client *client.VSCUClient, logger *logrus.Logger) error {
 	// 2. Sync basic data
 	logger.Info("Syncing basic data")
 
-	// Get code list
-	if _, err := client.GetCodeList(lastReqDt); err != nil {
-		return fmt.Errorf("failed to sync code list: %w", err)
+	// Get code list first as it's required for other operations
+	codeResp, err := client.GetCodeList(lastReqDt)
+	if err != nil {
+		if e, ok := err.(interface{ Code() string }); ok && e.Code() == "001" {
+			logger.Info("No codes found in current sync window, proceeding")
+		} else {
+			return fmt.Errorf("failed to sync code list: %w", err)
+		}
 	}
+	logger.WithField("response", codeResp).Info("Code list sync response")
 
 	// Get item classification list
-	if _, err := client.GetItemClassList(lastReqDt); err != nil {
-		return fmt.Errorf("failed to sync item classifications: %w", err)
+	itemClassResp, err := client.GetItemClassList(lastReqDt)
+	if err != nil {
+		if e, ok := err.(interface{ Code() string }); ok && e.Code() == "001" {
+			logger.Info("No item classifications found in current sync window, proceeding")
+		} else {
+			return fmt.Errorf("failed to sync item classifications: %w", err)
+		}
 	}
+	logger.WithField("response", itemClassResp).Info("Item classification sync response")
 
 	// Get branch list
-	if _, err := client.GetBranchList(lastReqDt); err != nil {
-		return fmt.Errorf("failed to sync branch list: %w", err)
+	branchResp, err := client.GetBranchList(lastReqDt)
+	if err != nil {
+		if e, ok := err.(interface{ Code() string }); ok && e.Code() == "001" {
+			logger.Info("No branches found in current sync window, proceeding")
+		} else {
+			return fmt.Errorf("failed to sync branch list: %w", err)
+		}
 	}
+	logger.WithField("response", branchResp).Info("Branch list sync response")
 
 	// Get notices
-	if _, err := client.GetNoticeList(lastReqDt); err != nil {
-		return fmt.Errorf("failed to sync notices: %w", err)
+	noticeResp, err := client.GetNoticeList(lastReqDt)
+	if err != nil {
+		if e, ok := err.(interface{ Code() string }); ok && e.Code() == "001" {
+			logger.Info("No notices found in current sync window, proceeding")
+		} else {
+			return fmt.Errorf("failed to sync notices: %w", err)
+		}
 	}
+	logger.WithField("response", noticeResp).Info("Notice list sync response")
 
-	// 3. Sync imported items (if head office)
+	// 3. Get existing items to see what we have
+	logger.Info("Checking existing items")
+	itemResp, err := client.GetItems(lastReqDt)
+	if err != nil {
+		if e, ok := err.(interface{ Code() string }); ok && e.Code() == "001" {
+			logger.Info("No items found in current sync window")
+		} else {
+			return fmt.Errorf("failed to get items: %w", err)
+		}
+	}
+	logger.WithField("response", itemResp).Info("Existing items response")
+
+	// 4. Sync imported items (if head office)
 	if client.BhfId == "00" {
 		logger.Info("Syncing imported items")
-		if _, err := client.GetImportedItems(lastReqDt); err != nil {
-			return fmt.Errorf("failed to sync imported items: %w", err)
+		importResp, err := client.GetImportedItems(lastReqDt)
+		if err != nil {
+			if e, ok := err.(interface{ Code() string }); ok && e.Code() == "001" {
+				logger.Info("No imported items found in current sync window")
+			} else {
+				return fmt.Errorf("failed to sync imported items: %w", err)
+			}
 		}
+		logger.WithField("response", importResp).Info("Imported items sync response")
 	}
 
 	logger.Info("Initialization and sync completed successfully")

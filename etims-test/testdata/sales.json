@@ -1,7 +1,7 @@
 {
     "tin": "P052248771P",
     "bhfId": "00",
-    "invcNo": "44",
+    "invcNo": "47",
     "orgInvcNo": "0",
     "custTin": "A123456789Z",
     "custNm": "Test Customer",
@@ -55,10 +55,10 @@
         {
             "itemSeq": 1,
             "itemCd": "KE1NTXU0000002",
-            "itemClsCd": "15101505",
+            "itemClsCd": "15100000",
             "itemNm": "Diesel Fuel",
             "bcd": "",
-            "pkgUnitCd": "PK",
+            "pkgUnitCd": "JY",
             "pkg": 100,
             "qtyUnitCd": "U",
             "qty": 100,

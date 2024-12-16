@@ -15,12 +15,16 @@ import (
 
 // APIError represents an error returned by the VSCU API
 type APIError struct {
-	Code    string
-	Message string
+	code    string
+	message string
 }
 
 func (e *APIError) Error() string {
-	return fmt.Sprintf("API error: %s (code: %s)", e.Message, e.Code)
+	return fmt.Sprintf("API error: %s (code: %s)", e.message, e.code)
+}
+
+func (e *APIError) Code() string {
+	return e.code
 }
 
 // VSCUClient handles all API interactions
@@ -114,10 +118,10 @@ func (c *VSCUClient) SendRequest(method, endpoint string, requestBody interface{
 	}
 
 	// Check for API-level errors
-	if apiResponse.ResultCd != "000" && apiResponse.ResultCd != "902" {
+	if apiResponse.ResultCd != "000" && apiResponse.ResultCd != "902" && apiResponse.ResultCd != "001" {
 		return &apiResponse, &APIError{
-			Code:    apiResponse.ResultCd,
-			Message: apiResponse.ResultMsg,
+			code:    apiResponse.ResultCd,
+			message: apiResponse.ResultMsg,
 		}
 	}
 
@@ -211,9 +215,12 @@ func (c *VSCUClient) GetSales(lastReqDt string) (*models.APIResponse, error) {
 
 // Stock Management Endpoints
 func (c *VSCUClient) SaveStock(stock models.StockRequest) (*models.APIResponse, error) {
-	stock.BaseRequest = models.BaseRequest{
-		Tin:   c.Tin,
-		BhfId: c.BhfId,
+	// Only set Tin and BhfId if they are empty
+	if stock.Tin == "" {
+		stock.Tin = c.Tin
+	}
+	if stock.BhfId == "" {
+		stock.BhfId = c.BhfId
 	}
 	return c.SendRequest("POST", "/stock/saveStockItems", stock, nil)
 }
