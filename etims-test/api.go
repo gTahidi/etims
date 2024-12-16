@@ -160,7 +160,7 @@ func main() {
 				RegrNm      string             `json:"regrNm"`
 				ModrId      string             `json:"modrId"`
 				ModrNm      string             `json:"modrNm"`
-				StockItems  []models.StockItem `json:"stockItems"`
+				StockItems  []models.StockItem `json:"itemList"`
 			}
 			if err := json.Unmarshal(data, &stockReq); err != nil {
 				logger.WithError(err).Error("Failed to parse stock request data")

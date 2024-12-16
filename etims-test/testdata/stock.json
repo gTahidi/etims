@@ -29,6 +29,7 @@
             "pkg": 1,
             "qtyUnitCd": "U",
             "qty": 10000,
+            "stockTyCd": "01",
             "itemExprDt": "20251215",
             "prc": 195.75,
             "splyAmt": 1957500,
