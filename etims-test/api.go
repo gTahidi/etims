@@ -255,6 +255,7 @@ func main() {
 }
 
 // Initialize device and sync basic data
+// Initialize device and sync basic data
 func initializeAndSync(client *client.VSCUClient, logger *logrus.Logger) error {
 	// 1. Device initialization
 	logger.Info("Initializing device")
@@ -274,74 +275,62 @@ func initializeAndSync(client *client.VSCUClient, logger *logrus.Logger) error {
 	// 2. Sync basic data
 	logger.Info("Syncing basic data")
 
-	// Get code list first as it's required for other operations
+	// Get code list
 	codeResp, err := client.GetCodeList(lastReqDt)
 	if err != nil {
-		if e, ok := err.(interface{ Code() string }); ok && e.Code() == "001" {
-			logger.Info("No codes found in current sync window, proceeding")
-		} else {
-			return fmt.Errorf("failed to sync code list: %w", err)
-		}
+		return fmt.Errorf("failed to sync code list: %w", err)
 	}
-	logger.WithField("response", codeResp).Info("Code list sync response")
+	if codeResp.ResultCd == "001" {
+		logger.Info("No code list found")
+	} else if codeResp.ResultCd != "000" {
+		return fmt.Errorf("failed to sync code list: API error: %s (code: %s)", codeResp.ResultMsg, codeResp.ResultCd)
+	}
 
 	// Get item classification list
 	itemClassResp, err := client.GetItemClassList(lastReqDt)
 	if err != nil {
-		if e, ok := err.(interface{ Code() string }); ok && e.Code() == "001" {
-			logger.Info("No item classifications found in current sync window, proceeding")
-		} else {
-			return fmt.Errorf("failed to sync item classifications: %w", err)
-		}
+		return fmt.Errorf("failed to sync item classifications: %w", err)
 	}
-	logger.WithField("response", itemClassResp).Info("Item classification sync response")
+	if itemClassResp.ResultCd == "001" {
+		logger.Info("No item classification list found")
+	} else if itemClassResp.ResultCd != "000" {
+		return fmt.Errorf("failed to sync item classifications: API error: %s (code: %s)", itemClassResp.ResultMsg, itemClassResp.ResultCd)
+	}
 
 	// Get branch list
 	branchResp, err := client.GetBranchList(lastReqDt)
 	if err != nil {
-		if e, ok := err.(interface{ Code() string }); ok && e.Code() == "001" {
-			logger.Info("No branches found in current sync window, proceeding")
-		} else {
-			return fmt.Errorf("failed to sync branch list: %w", err)
-		}
+		return fmt.Errorf("failed to sync branch list: %w", err)
 	}
-	logger.WithField("response", branchResp).Info("Branch list sync response")
+	if branchResp.ResultCd == "001" {
+		logger.Info("No branch list found")
+	} else if branchResp.ResultCd != "000" {
+		return fmt.Errorf("failed to sync branch list: API error: %s (code: %s)", branchResp.ResultMsg, branchResp.ResultCd)
+	}
 
 	// Get notices
 	noticeResp, err := client.GetNoticeList(lastReqDt)
 	if err != nil {
-		if e, ok := err.(interface{ Code() string }); ok && e.Code() == "001" {
-			logger.Info("No notices found in current sync window, proceeding")
-		} else {
-			return fmt.Errorf("failed to sync notices: %w", err)
-		}
+		return fmt.Errorf("failed to sync notices: %w", err)
 	}
-	logger.WithField("response", noticeResp).Info("Notice list sync response")
-
-	// 3. Get existing items to see what we have
-	logger.Info("Checking existing items")
-	itemResp, err := client.GetItems(lastReqDt)
-	if err != nil {
-		if e, ok := err.(interface{ Code() string }); ok && e.Code() == "001" {
-			logger.Info("No items found in current sync window")
-		} else {
-			return fmt.Errorf("failed to get items: %w", err)
-		}
+	if noticeResp.ResultCd == "001" {
+		logger.Info("No notices found")
+	} else if noticeResp.ResultCd != "000" {
+		return fmt.Errorf("failed to sync notices: API error: %s (code: %s)", noticeResp.ResultMsg, noticeResp.ResultCd)
 	}
-	logger.WithField("response", itemResp).Info("Existing items response")
 
-	// 4. Sync imported items (if head office)
+	// 3. Sync imported items (if head office)
 	if client.BhfId == "00" {
 		logger.Info("Syncing imported items")
-		importResp, err := client.GetImportedItems(lastReqDt)
+		importedItemsResp, err := client.GetImportedItems(lastReqDt)
 		if err != nil {
-			if e, ok := err.(interface{ Code() string }); ok && e.Code() == "001" {
-				logger.Info("No imported items found in current sync window")
-			} else {
-				return fmt.Errorf("failed to sync imported items: %w", err)
-			}
+			return fmt.Errorf("failed to sync imported items: %w", err)
 		}
-		logger.WithField("response", importResp).Info("Imported items sync response")
+		if importedItemsResp.ResultCd == "001" {
+			logger.Info("No imported items found")
+		} else if importedItemsResp.ResultCd != "000" {
+			return fmt.Errorf("failed to sync imported items: API error: %s (code: %s)", importedItemsResp.ResultMsg, importedItemsResp.ResultCd)
+		}
 	}
 
 	logger.Info("Initialization and sync completed successfully")

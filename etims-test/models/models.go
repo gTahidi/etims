@@ -383,6 +383,12 @@ func (r SalesRequest) Validate() error {
 	return nil
 }
 
+type CodeListRequest struct {
+	Tin       string `json:"tin"`
+	BhfId     string `json:"bhfId"`
+	LastReqDt string `json:"lastReqDt"`
+}
+
 // InitRequest represents a device initialization request
 type InitRequest struct {
 	Tin      string `json:"tin"`
