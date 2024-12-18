@@ -204,6 +204,30 @@ func (r ItemRequest) Validate() error {
 	return nil
 }
 
+// StockItem represents an item in a stock transaction
+type StockItem struct {
+	ItemSeq    int     `json:"itemSeq"`
+	ItemCd     string  `json:"itemCd"`
+	ItemClsCd  string  `json:"itemClsCd"`
+	ItemNm     string  `json:"itemNm"`
+	PkgUnitCd  string  `json:"pkgUnitCd"`
+	Pkg        int     `json:"pkg"`
+	QtyUnitCd  string  `json:"qtyUnitCd"`
+	Qty        int     `json:"qty"`
+	Prc        float64 `json:"prc"`
+	SplyAmt    float64 `json:"splyAmt"`
+	DcRt       float64 `json:"dcRt"`
+	DcAmt      float64 `json:"dcAmt"`
+	TotDcAmt   float64 `json:"totDcAmt"`
+	TaxTyCd    string  `json:"taxTyCd"`
+	TaxblAmt   float64 `json:"taxblAmt"`
+	TaxAmt     float64 `json:"taxAmt"`
+	TotAmt     float64 `json:"totAmt"`
+	StockTyCd  string  `json:"stockTyCd"`
+	ItemExprDt string  `json:"itemExprDt"`
+	Remark     string  `json:"remark"`
+}
+
 // StockRequest for managing stock
 type StockRequest struct {
 	BaseRequest
@@ -226,30 +250,6 @@ type StockRequest struct {
 	ModrId      string      `json:"modrId"`
 	ModrNm      string      `json:"modrNm"`
 	ItemList    []StockItem `json:"itemList"`
-}
-
-type StockItem struct {
-	ItemSeq    int     `json:"itemSeq"`
-	ItemCd     string  `json:"itemCd"`
-	ItemNm     string  `json:"itemNm"`
-	ItemClsCd  string  `json:"itemClsCd"`
-	PkgUnitCd  string  `json:"pkgUnitCd"`
-	Pkg        int     `json:"pkg"`
-	QtyUnitCd  string  `json:"qtyUnitCd"`
-	TaxTyCd    string  `json:"taxTyCd"`
-	DtyPrc     float64 `json:"dtyPrc"`
-	Qty        int     `json:"qty"`
-	StockTyCd  string  `json:"stockTyCd"`
-	BatchNo    string  `json:"batchNo"`
-	ItemExprDt string  `json:"itemExprDt"`
-	ItemSrno   string  `json:"itemSrno"`
-	Prc        float64 `json:"prc"`
-	SplyAmt    float64 `json:"splyAmt"`
-	TotDcAmt   float64 `json:"totDcAmt"`
-	TaxblAmt   float64 `json:"taxblAmt"`
-	TaxAmt     float64 `json:"taxAmt"`
-	TotAmt     float64 `json:"totAmt"`
-	Remark     string  `json:"remark"`
 }
 
 func (r StockRequest) Validate() error {
@@ -456,4 +456,36 @@ type PurchaseConfirmationRequest struct {
 	Remark     string `json:"remark,omitempty"`
 	ModrNm     string `json:"modrNm"` // Modifier Name
 	ModrId     string `json:"modrId"` // Modifier ID
+}
+
+// CodeSaveRequest represents a request to save codes
+type CodeSaveRequest struct {
+	Tin   string `json:"tin"`
+	BhfId string `json:"bhfId"`
+	Codes []Code `json:"codes"`
+}
+
+// Code represents a code entry
+type Code struct {
+	GroupCd string `json:"groupCd"`
+	GroupNm string `json:"groupNm"`
+	CodeCd  string `json:"codeCd"`
+	CodeNm  string `json:"codeNm"`
+	UseYn   string `json:"useYn"`
+}
+
+// ItemClassSaveRequest represents a request to save item classifications
+type ItemClassSaveRequest struct {
+	Tin         string      `json:"tin"`
+	BhfId       string      `json:"bhfId"`
+	ItemClasses []ItemClass `json:"itemClasses"`
+}
+
+// ItemClass represents an item classification
+type ItemClass struct {
+	ItemClsCd  string `json:"itemClsCd"`
+	ItemClsNm  string `json:"itemClsNm"`
+	ItemClsLvl int    `json:"itemClsLvl"`
+	UseYn      string `json:"useYn"`
+	VatYn      string `json:"vatYn"`
 }

@@ -1,5 +1,35 @@
 {
     "tin": "P052248771P",
     "bhfId": "00",
-    "lastReqDt": "20241215170000"
+    "lastReqDt": "20241216000000",
+    "itemClasses": [
+        {
+            "itemClsCd": "15101502",
+            "itemClsNm": "Kerosene",
+            "itemClsLvl": 4,
+            "useYn": "Y",
+            "vatYn": "Y"
+        },
+        {
+            "itemClsCd": "15101505",
+            "itemClsNm": "Diesel fuel",
+            "itemClsLvl": 4,
+            "useYn": "Y",
+            "vatYn": "Y"
+        },
+        {
+            "itemClsCd": "15101506",
+            "itemClsNm": "Gasoline or Petrol",
+            "itemClsLvl": 4,
+            "useYn": "Y",
+            "vatYn": "Y"
+        },
+        {
+            "itemClsCd": "15101504",
+            "itemClsNm": "Aviation fuel",
+            "itemClsLvl": 4,
+            "useYn": "Y",
+            "vatYn": "Y"
+        }
+    ]
 }

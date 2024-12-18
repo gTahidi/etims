@@ -1,5 +1,21 @@
 {
     "tin": "P052248771P",
     "bhfId": "00",
-    "lastReqDt": "20241215170000"
+    "lastReqDt": "20241216000000",
+    "codes": [
+        {
+            "groupCd": "15100000",
+            "groupNm": "Fuels",
+            "codeCd": "01",
+            "codeNm": "Regular",
+            "useYn": "Y"
+        },
+        {
+            "groupCd": "15101500",
+            "groupNm": "Petroleum and distillates",
+            "codeCd": "02",
+            "codeNm": "Premium",
+            "useYn": "Y"
+        }
+    ]
 }
