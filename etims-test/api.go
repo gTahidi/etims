@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 
@@ -128,80 +129,68 @@ func main() {
 				return nil
 			}
 
-			// Send sales request
+			// Create stock movement first to validate stock levels
+			stockMovement, err := client.CreateStockMovementFromSale(data)
+			if err != nil {
+				logger.WithError(err).Error("Failed to create stock movement - possibly insufficient stock")
+				return nil
+			}
+
+			// If stock validation passed, proceed with the sale
 			resp, err := client.SaveSales(salesReq)
 			if err != nil {
 				logger.WithError(err).Error("Failed to send sales request")
 				return nil
 			}
-
 			logger.WithField("response", resp).Info("Sales request successful")
+			logger.WithField("stockMovement", stockMovement).Info("Stock movement created for sale")
 
 		case "stock.json":
-			// Parse stock request
-			var stockReq struct {
-				Tin         string             `json:"tin"`
-				BhfId       string             `json:"bhfId"`
-				SarNo       int                `json:"sarNo"`
-				OrgSarNo    int                `json:"orgSarNo"`
-				RegTyCd     string             `json:"regTyCd"`
-				CustTin     string             `json:"custTin"`
-				CustNm      string             `json:"custNm"`
-				CustBhfId   string             `json:"custBhfId"`
-				SarTyCd     string             `json:"sarTyCd"`
-				OcrnDt      string             `json:"ocrnDt"`
-				StockRlsDt  string             `json:"stockRlsDt"`
-				TotItemCnt  int                `json:"totItemCnt"`
-				TotTaxblAmt float64            `json:"totTaxblAmt"`
-				TotTaxAmt   float64            `json:"totTaxAmt"`
-				TotAmt      float64            `json:"totAmt"`
-				Remark      string             `json:"remark"`
-				RegrId      string             `json:"regrId"`
-				RegrNm      string             `json:"regrNm"`
-				ModrId      string             `json:"modrId"`
-				ModrNm      string             `json:"modrNm"`
-				StockItems  []models.StockItem `json:"itemList"`
-			}
-			if err := json.Unmarshal(data, &stockReq); err != nil {
-				logger.WithError(err).Error("Failed to parse stock request data")
-				return nil
+			// First try to parse as array
+			var stockReqArray []models.StockRequest
+			if err := json.Unmarshal(data, &stockReqArray); err != nil {
+				// If array parsing fails, try single object
+				var singleStockReq models.StockRequest
+				if err := json.Unmarshal(data, &singleStockReq); err != nil {
+					logger.WithError(err).Error("Failed to parse stock request data as array or single object")
+					return nil
+				}
+				stockReqArray = []models.StockRequest{singleStockReq}
 			}
 
-			// Create StockRequest with all fields
-			req := models.StockRequest{
-				BaseRequest: models.BaseRequest{
-					Tin:   stockReq.Tin,
-					BhfId: stockReq.BhfId,
-				},
-				SarNo:       stockReq.SarNo,
-				OrgSarNo:    stockReq.OrgSarNo,
-				RegTyCd:     stockReq.RegTyCd,
-				CustTin:     stockReq.CustTin,
-				CustNm:      stockReq.CustNm,
-				CustBhfId:   stockReq.CustBhfId,
-				SarTyCd:     stockReq.SarTyCd,
-				OcrnDt:      stockReq.OcrnDt,
-				StockRlsDt:  stockReq.StockRlsDt,
-				TotItemCnt:  stockReq.TotItemCnt,
-				TotTaxblAmt: stockReq.TotTaxblAmt,
-				TotTaxAmt:   stockReq.TotTaxAmt,
-				TotAmt:      stockReq.TotAmt,
-				Remark:      stockReq.Remark,
-				RegrId:      stockReq.RegrId,
-				RegrNm:      stockReq.RegrNm,
-				ModrId:      stockReq.ModrId,
-				ModrNm:      stockReq.ModrNm,
-				ItemList:    stockReq.StockItems,
-			}
+			// Process each stock request
+			for _, req := range stockReqArray {
+				// Ensure required fields are set for each item
+				for i := range req.ItemList {
+					// Initialize discount fields if not set
+					if req.ItemList[i].DcRt == 0 {
+						req.ItemList[i].DcRt = 0
+					}
+					if req.ItemList[i].DcAmt == 0 {
+						req.ItemList[i].DcAmt = 0
+					}
+					if req.ItemList[i].TotDcAmt == 0 {
+						req.ItemList[i].TotDcAmt = 0
+					}
 
-			// Send stock request
-			resp, err := client.SaveStock(req)
-			if err != nil {
-				logger.WithError(err).Error("Failed to send stock request")
-				return nil
-			}
+					// Set stock type based on SAR type
+					if req.SarTyCd == "01" { // Stock In
+						req.ItemList[i].StockTyCd = "01" // Stock In
+					} else if req.SarTyCd == "02" { // Stock Out
+						req.ItemList[i].StockTyCd = "02" // Stock Out
+						// For stock out, make quantity negative
+						req.ItemList[i].Qty = -math.Abs(req.ItemList[i].Qty)
+					}
+				}
 
-			logger.WithField("response", resp).Info("Stock request successful")
+				// Send stock request
+				resp, err := client.SaveStock(req)
+				if err != nil {
+					logger.WithError(err).Error("Failed to send stock request")
+					continue
+				}
+				logger.WithField("response", resp).Info("Stock request successful")
+			}
 
 		case "item.json":
 			// Parse items list

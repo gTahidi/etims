@@ -210,10 +210,11 @@ type StockItem struct {
 	ItemCd     string  `json:"itemCd"`
 	ItemClsCd  string  `json:"itemClsCd"`
 	ItemNm     string  `json:"itemNm"`
+	Bcd        *string `json:"bcd,omitempty"`
 	PkgUnitCd  string  `json:"pkgUnitCd"`
 	Pkg        int     `json:"pkg"`
 	QtyUnitCd  string  `json:"qtyUnitCd"`
-	Qty        int     `json:"qty"`
+	Qty        float64 `json:"qty"`
 	Prc        float64 `json:"prc"`
 	SplyAmt    float64 `json:"splyAmt"`
 	DcRt       float64 `json:"dcRt"`
@@ -225,7 +226,7 @@ type StockItem struct {
 	TotAmt     float64 `json:"totAmt"`
 	StockTyCd  string  `json:"stockTyCd"`
 	ItemExprDt string  `json:"itemExprDt"`
-	Remark     string  `json:"remark"`
+	Remark     string  `json:"remark,omitempty"`
 }
 
 // StockRequest for managing stock
@@ -234,17 +235,17 @@ type StockRequest struct {
 	SarNo       int         `json:"sarNo"`
 	OrgSarNo    int         `json:"orgSarNo"`
 	RegTyCd     string      `json:"regTyCd"`
-	CustTin     string      `json:"custTin"`
-	CustNm      string      `json:"custNm"`
-	CustBhfId   string      `json:"custBhfId"`
+	CustTin     *string     `json:"custTin,omitempty"`
+	CustNm      *string     `json:"custNm,omitempty"`
+	CustBhfId   *string     `json:"custBhfId,omitempty"`
 	SarTyCd     string      `json:"sarTyCd"`
 	OcrnDt      string      `json:"ocrnDt"`
-	StockRlsDt  string      `json:"stockRlsDt"`
+	StockRlsDt  string      `json:"stockRlsDt,omitempty"`
 	TotItemCnt  int         `json:"totItemCnt"`
 	TotTaxblAmt float64     `json:"totTaxblAmt"`
 	TotTaxAmt   float64     `json:"totTaxAmt"`
 	TotAmt      float64     `json:"totAmt"`
-	Remark      string      `json:"remark"`
+	Remark      string      `json:"remark,omitempty"`
 	RegrId      string      `json:"regrId"`
 	RegrNm      string      `json:"regrNm"`
 	ModrId      string      `json:"modrId"`
@@ -343,7 +344,7 @@ type SalesItem struct {
 	PkgUnitCd string  `json:"pkgUnitCd"`
 	Pkg       int     `json:"pkg"`
 	QtyUnitCd string  `json:"qtyUnitCd"`
-	Qty       int     `json:"qty"`
+	Qty       float64 `json:"qty"`
 	Prc       float64 `json:"prc"`
 	SplyAmt   float64 `json:"splyAmt"`
 	DcRt      float64 `json:"dcRt"`

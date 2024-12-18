@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"os"
 	"path/filepath"
 	"time"
@@ -18,9 +19,9 @@ type StockMovementRecord struct {
 	SarNo       int              `json:"sarNo"`
 	OrgSarNo    int              `json:"orgSarNo"`
 	RegTyCd     string           `json:"regTyCd"`
-	CustTin     *string          `json:"custTin"`
-	CustNm      *string          `json:"custNm"`
-	CustBhfId   *string          `json:"custBhfId"`
+	CustTin     *string          `json:"custTin,omitempty"`
+	CustNm      *string          `json:"custNm,omitempty"`
+	CustBhfId   *string          `json:"custBhfId,omitempty"`
 	SarTyCd     string           `json:"sarTyCd"`
 	OcrnDt      string           `json:"ocrnDt"`
 	StockRlsDt  string           `json:"stockRlsDt"`
@@ -36,11 +37,22 @@ type StockMovementRecord struct {
 	ItemList    []models.StockItem `json:"itemList"`
 }
 
+// StockInventory represents the current stock levels
+type StockInventory struct {
+	ItemCd string  `json:"itemCd"`
+	Qty    float64 `json:"qty"`
+}
+
 // CreateStockMovementFromSale creates a stock movement record from a sales transaction
 func (c *VSCUClient) CreateStockMovementFromSale(salesData []byte) (*StockMovementRecord, error) {
 	var sale models.SalesRequest
 	if err := json.Unmarshal(salesData, &sale); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal sales data: %w", err)
+	}
+
+	// Validate stock availability before proceeding
+	if err := c.ValidateStockAvailability(sale); err != nil {
+		return nil, fmt.Errorf("stock validation failed: %w", err)
 	}
 
 	// Get the latest SarNo from stock.json
@@ -54,9 +66,13 @@ func (c *VSCUClient) CreateStockMovementFromSale(salesData []byte) (*StockMoveme
 	if len(stockData) > 0 {
 		var movements []StockMovementRecord
 		if err := json.Unmarshal(stockData, &movements); err != nil {
-			return nil, fmt.Errorf("failed to parse stock data: %w", err)
-		}
-		if len(movements) > 0 {
+			// Try unmarshaling as single record if array fails
+			var singleMovement StockMovementRecord
+			if err2 := json.Unmarshal(stockData, &singleMovement); err2 != nil {
+				return nil, fmt.Errorf("failed to parse stock data: %w", err)
+			}
+			lastSarNo = singleMovement.SarNo
+		} else if len(movements) > 0 {
 			lastSarNo = movements[len(movements)-1].SarNo
 		}
 	}
@@ -71,9 +87,10 @@ func (c *VSCUClient) CreateStockMovementFromSale(salesData []byte) (*StockMoveme
 	}
 	// BhfId is not in the sales data, so we'll leave it as nil
 
-	// Format current time for ocrnDt
-	currentTime := time.Date(2024, 12, 18, 14, 53, 27, 0, time.UTC).Add(3 * time.Hour)
+	// Format current time for ocrnDt and stockRlsDt
+	currentTime := time.Now()
 	ocrnDt := currentTime.Format("20060102")
+	stockRlsDt := currentTime.Format("20060102150405") // YYYYMMDDhhmmss format
 
 	// Create new stock movement record
 	stockMovement := &StockMovementRecord{
@@ -81,13 +98,13 @@ func (c *VSCUClient) CreateStockMovementFromSale(salesData []byte) (*StockMoveme
 		BhfId:       sale.BhfId,
 		SarNo:       lastSarNo + 1,
 		OrgSarNo:    0,
-		RegTyCd:     "M", // M for Movement
+		RegTyCd:     "M", // M for Movement (sales)
 		CustTin:     custTin,
 		CustNm:      custNm,
 		CustBhfId:   custBhfId,
-		SarTyCd:     "11", // 11 for Sales Out
+		SarTyCd:     "02", // 02 for Stock Out
 		OcrnDt:      ocrnDt,
-		StockRlsDt:  "", // This should be fetched from the original stock record
+		StockRlsDt:  stockRlsDt,
 		TotItemCnt:  sale.TotItemCnt,
 		TotTaxblAmt: sale.TotTaxblAmt,
 		TotTaxAmt:   sale.TotTaxAmt,
@@ -110,12 +127,13 @@ func (c *VSCUClient) CreateStockMovementFromSale(salesData []byte) (*StockMoveme
 			PkgUnitCd:  item.PkgUnitCd,
 			Pkg:        item.Pkg,
 			QtyUnitCd:  item.QtyUnitCd,
-			Qty:        item.Qty,
-			StockTyCd:  "11", // 11 for Sales Out
-			ItemExprDt: "20251215", // This should be fetched from the original stock record
+			Qty:        -math.Abs(float64(item.Qty)), // Make quantity negative for stock out
+			StockTyCd:  "02", // 02 for Stock Out
+			ItemExprDt: stockRlsDt[:8], // Use the same date as stockRlsDt
 			Prc:        item.Prc,
 			SplyAmt:    item.SplyAmt,
 			DcAmt:      item.DcAmt,
+			DcRt:       item.DcRt,
 			TotDcAmt:   item.DcAmt, // Using DcAmt as TotDcAmt
 			TaxblAmt:   item.TaxblAmt,
 			TaxTyCd:    item.TaxTyCd,
@@ -126,21 +144,9 @@ func (c *VSCUClient) CreateStockMovementFromSale(salesData []byte) (*StockMoveme
 		stockMovement.ItemList = append(stockMovement.ItemList, stockItem)
 	}
 
-	// Save the updated stock movements back to file
-	var stockMovements []StockMovementRecord
-	if len(stockData) > 0 {
-		if err := json.Unmarshal(stockData, &stockMovements); err != nil {
-			return nil, fmt.Errorf("failed to parse stock data: %w", err)
-		}
-	}
-	stockMovements = append(stockMovements, *stockMovement)
-	updatedStockData, err := json.MarshalIndent(stockMovements, "", "    ")
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal updated stock data: %w", err)
-	}
-
-	if err := ioutil.WriteFile(stockFile, updatedStockData, 0644); err != nil {
-		return nil, fmt.Errorf("failed to write updated stock data: %w", err)
+	// Save the stock movement
+	if err := c.SaveStockMovement(stockMovement); err != nil {
+		return nil, fmt.Errorf("failed to save stock movement: %w", err)
 	}
 
 	return stockMovement, nil
@@ -148,25 +154,25 @@ func (c *VSCUClient) CreateStockMovementFromSale(salesData []byte) (*StockMoveme
 
 // SaveStockMovement saves the stock movement record to the stock.json file
 func (c *VSCUClient) SaveStockMovement(movement *StockMovementRecord) error {
+	stockFile := filepath.Join("testdata", "stock.json")
+	
 	// Load existing movements
 	movements, err := c.LoadStockMovements()
-	if err != nil {
-		return err
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("failed to load existing stock movements: %w", err)
 	}
 
-	// Add new movement
+	// Append new movement
 	movements = append(movements, *movement)
 
-	// Marshal the movements array to JSON
-	movementJSON, err := json.MarshalIndent(movements, "", "    ")
+	// Save back to file
+	stockData, err := json.MarshalIndent(movements, "", "    ")
 	if err != nil {
-		return fmt.Errorf("error marshaling stock movements: %v", err)
+		return fmt.Errorf("failed to marshal stock movements: %w", err)
 	}
 
-	// Write to file
-	stockFile := filepath.Join("testdata", "stock.json")
-	if err := ioutil.WriteFile(stockFile, movementJSON, 0644); err != nil {
-		return fmt.Errorf("error writing stock movements: %v", err)
+	if err := ioutil.WriteFile(stockFile, stockData, 0644); err != nil {
+		return fmt.Errorf("failed to write stock file: %w", err)
 	}
 
 	return nil
@@ -175,22 +181,65 @@ func (c *VSCUClient) SaveStockMovement(movement *StockMovementRecord) error {
 // LoadStockMovements loads all stock movements from the stock.json file
 func (c *VSCUClient) LoadStockMovements() ([]StockMovementRecord, error) {
 	stockFile := filepath.Join("testdata", "stock.json")
-
-	// Read existing file
-	data, err := ioutil.ReadFile(stockFile)
+	stockData, err := ioutil.ReadFile(stockFile)
 	if err != nil {
 		if os.IsNotExist(err) {
-			// If file doesn't exist, return empty array
 			return []StockMovementRecord{}, nil
 		}
-		return nil, fmt.Errorf("error reading stock movements: %v", err)
+		return nil, fmt.Errorf("failed to read stock file: %w", err)
 	}
 
-	// Parse JSON array
+	if len(stockData) == 0 {
+		return []StockMovementRecord{}, nil
+	}
+
+	// Try to unmarshal as array first
 	var movements []StockMovementRecord
-	if err := json.Unmarshal(data, &movements); err != nil {
-		return nil, fmt.Errorf("error parsing stock movements: %v", err)
+	if err := json.Unmarshal(stockData, &movements); err == nil {
+		return movements, nil
 	}
 
-	return movements, nil
+	// If array unmarshal fails, try as single object
+	var singleMovement StockMovementRecord
+	if err := json.Unmarshal(stockData, &singleMovement); err != nil {
+		return nil, fmt.Errorf("failed to parse stock data: %w", err)
+	}
+
+	// Return single movement as slice
+	return []StockMovementRecord{singleMovement}, nil
+}
+
+// GetCurrentStock gets the current stock level for an item
+func (c *VSCUClient) GetCurrentStock(itemCd string) (float64, error) {
+	movements, err := c.LoadStockMovements()
+	if err != nil {
+		return 0, fmt.Errorf("failed to load stock movements: %w", err)
+	}
+
+	var currentQty float64
+	for _, mov := range movements {
+		for _, item := range mov.ItemList {
+			if item.ItemCd == itemCd {
+				currentQty += item.Qty // Will add for stock in, subtract for stock out (due to negative quantities)
+			}
+		}
+	}
+
+	return currentQty, nil
+}
+
+// ValidateStockAvailability checks if we have enough stock for a sale
+func (c *VSCUClient) ValidateStockAvailability(sale models.SalesRequest) error {
+	for _, item := range sale.ItemList {
+		currentStock, err := c.GetCurrentStock(item.ItemCd)
+		if err != nil {
+			return fmt.Errorf("failed to get current stock for item %s: %w", item.ItemCd, err)
+		}
+
+		if currentStock < float64(item.Qty) {
+			return fmt.Errorf("insufficient stock for item %s: have %.2f, need %.2f", 
+				item.ItemCd, currentStock, float64(item.Qty))
+		}
+	}
+	return nil
 }
