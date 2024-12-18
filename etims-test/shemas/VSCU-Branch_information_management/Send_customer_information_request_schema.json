@@ -1,0 +1,17 @@
+{
+    "tin": "P123456789Z",
+    "bhfId": "00",
+    "custNo": "999991113",
+    "custTin": "A123456789Z",
+    "custNm": "MTEJA LIMITED",
+    "adrs": null,
+    "telNo": null,
+    "email": null,
+    "faxNo": null,
+    "useYn": "Y",
+    "remark": null,
+    "regrNm": "Admin",
+    "regrId": "Admin",
+    "modrNm": "Admin",
+    "modrId": "Admin"
+}
