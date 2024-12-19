@@ -12,6 +12,9 @@ import (
 
 	"etims-test/client"
 	"etims-test/models"
+	"time"
+
+	"github.com/logdyhq/logdy-core/logdy"
 )
 
 type Config struct {
@@ -80,20 +83,26 @@ func main() {
 	}
 
 	// Setup logger
-	logger := setupLogger(config)
+	mainLogger := setupLogger(config)
+
+	// Start Logdy UI logger in a goroutine
+	go Logger()
 
 	// Create VSCU client
-	client := client.NewVSCUClient(
+	client, err := client.NewVSCUClient(
 		config.API.BaseURL,
 		config.API.Tin,
 		config.API.BhfId,
 		config.API.CmcKey,
-		logger,
+		mainLogger,
 	)
+	if err != nil {
+		mainLogger.Fatalf("Failed to create VSCU client: %v", err)
+	}
 
 	// Initialize device and sync data
-	if err := initializeAndSync(client, logger); err != nil {
-		logger.WithError(err).Fatal("Failed to initialize device and sync data")
+	if err := initializeAndSync(client, mainLogger); err != nil {
+		mainLogger.WithError(err).Fatal("Failed to initialize device and sync data")
 	}
 
 	// Define the order of processing
@@ -108,19 +117,19 @@ func main() {
 	// Process files in order
 	for _, filename := range fileOrder {
 		filepath := filepath.Join(*testDataDir, filename)
-		
+
 		// Skip if file doesn't exist
 		if _, err := os.Stat(filepath); os.IsNotExist(err) {
-			logger.WithField("file", filepath).Info("File does not exist, skipping")
+			mainLogger.WithField("file", filepath).Info("File does not exist, skipping")
 			continue
 		}
 
-		logger.WithField("file", filepath).Info("Processing test data file")
+		mainLogger.WithField("file", filepath).Info("Processing test data file")
 
 		// Read and process the test data file
 		data, err := os.ReadFile(filepath)
 		if err != nil {
-			logger.WithError(err).Error("Failed to read test data file")
+			mainLogger.WithError(err).Error("Failed to read test data file")
 			continue
 		}
 
@@ -129,16 +138,16 @@ func main() {
 		case "branch_customer.json":
 			var custReq models.BranchCustomerRequest
 			if err := json.Unmarshal(data, &custReq); err != nil {
-				logger.WithError(err).Error("Failed to parse branch customer request data")
+				mainLogger.WithError(err).Error("Failed to parse branch customer request data")
 				continue
 			}
 
 			resp, err := client.SaveBranchCustomer(custReq)
 			if err != nil {
-				logger.WithError(err).Error("Failed to send branch customer request")
+				mainLogger.WithError(err).Error("Failed to send branch customer request")
 				continue
 			}
-			logger.WithField("response", resp).Info("Branch customer request successful")
+			mainLogger.WithField("response", resp).Info("Branch customer request successful")
 
 		case "item.json":
 			var itemsList struct {
@@ -147,17 +156,17 @@ func main() {
 				Items []models.ItemRequest `json:"items"`
 			}
 			if err := json.Unmarshal(data, &itemsList); err != nil {
-				logger.WithError(err).Error("Failed to parse items list")
+				mainLogger.WithError(err).Error("Failed to parse items list")
 				continue
 			}
 
 			for _, item := range itemsList.Items {
 				resp, err := client.SaveItem(item)
 				if err != nil {
-					logger.WithError(err).Error("Failed to send item request")
+					mainLogger.WithError(err).Error("Failed to send item request")
 					continue
 				}
-				logger.WithFields(logrus.Fields{
+				mainLogger.WithFields(logrus.Fields{
 					"itemCd":   item.ItemCd,
 					"response": resp,
 				}).Info("Item registration successful")
@@ -168,7 +177,7 @@ func main() {
 			if err := json.Unmarshal(data, &stockReqArray); err != nil {
 				var singleStockReq models.StockRequest
 				if err := json.Unmarshal(data, &singleStockReq); err != nil {
-					logger.WithError(err).Error("Failed to parse stock request data")
+					mainLogger.WithError(err).Error("Failed to parse stock request data")
 					continue
 				}
 				stockReqArray = []models.StockRequest{singleStockReq}
@@ -196,53 +205,53 @@ func main() {
 
 				resp, err := client.SaveStock(req)
 				if err != nil {
-					logger.WithError(err).Error("Failed to send stock request")
+					mainLogger.WithError(err).Error("Failed to send stock request")
 					continue
 				}
-				logger.WithField("response", resp).Info("Stock request successful")
+				mainLogger.WithField("response", resp).Info("Stock request successful")
 			}
 
 		case "purchase.json":
 			var purchaseReq models.PurchaseRequest
 			if err := json.Unmarshal(data, &purchaseReq); err != nil {
-				logger.WithError(err).Error("Failed to parse purchase request data")
+				mainLogger.WithError(err).Error("Failed to parse purchase request data")
 				continue
 			}
 
 			resp, err := client.SavePurchase(purchaseReq)
 			if err != nil {
-				logger.WithError(err).Error("Failed to send purchase request")
+				mainLogger.WithError(err).Error("Failed to send purchase request")
 				continue
 			}
-			logger.WithField("response", resp).Info("Purchase request successful")
+			mainLogger.WithField("response", resp).Info("Purchase request successful")
 
 			stockMovement, err := client.CreateStockMovementFromPurchase(data)
 			if err != nil {
-				logger.WithError(err).Error("Failed to create stock movement for purchase")
+				mainLogger.WithError(err).Error("Failed to create stock movement for purchase")
 				continue
 			}
-			logger.WithField("stockMovement", stockMovement).Info("Stock movement created for purchase")
+			mainLogger.WithField("stockMovement", stockMovement).Info("Stock movement created for purchase")
 
 		case "sales.json":
 			var salesReq models.SalesRequest
 			if err := json.Unmarshal(data, &salesReq); err != nil {
-				logger.WithError(err).Error("Failed to parse sales request data")
+				mainLogger.WithError(err).Error("Failed to parse sales request data")
 				continue
 			}
 
 			stockMovement, err := client.CreateStockMovementFromSale(data)
 			if err != nil {
-				logger.WithError(err).Error("Failed to create stock movement - possibly insufficient stock")
+				mainLogger.WithError(err).Error("Failed to create stock movement - possibly insufficient stock")
 				continue
 			}
 
 			resp, err := client.SaveSales(salesReq)
 			if err != nil {
-				logger.WithError(err).Error("Failed to send sales request")
+				mainLogger.WithError(err).Error("Failed to send sales request")
 				continue
 			}
-			logger.WithField("response", resp).Info("Sales request successful")
-			logger.WithField("stockMovement", stockMovement).Info("Stock movement created for sale")
+			mainLogger.WithField("response", resp).Info("Sales request successful")
+			mainLogger.WithField("stockMovement", stockMovement).Info("Stock movement created for sale")
 		}
 	}
 }
@@ -328,4 +337,25 @@ func initializeAndSync(client *client.VSCUClient, logger *logrus.Logger) error {
 
 	logger.Info("Initialization and sync completed successfully")
 	return nil
+}
+
+func Logger() {
+	// This will start a webserver
+	// with a Logdy UI on 127.0.0.1:8080
+	logdyLogger := logdy.InitializeLogdy(logdy.Config{
+		ServerIp:   "127.0.0.1",
+		ServerPort: "8080",
+	}, nil)
+
+	// Run in the loop forever
+	for {
+		// Produce structured message that will be translated to JSON
+		logdyLogger.Log(logdy.Fields{"foo": "bar"})
+
+		// Produce a string
+		logdyLogger.LogString("This is just a string " + time.Now().String())
+
+		time.Sleep(1 * time.Second)
+	}
+
 }

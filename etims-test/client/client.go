@@ -11,6 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"etims-test/models"
+	"etims-test/validator"
 )
 
 // APIError represents an error returned by the VSCU API
@@ -29,24 +30,32 @@ func (e *APIError) Code() string {
 
 // VSCUClient handles all API interactions
 type VSCUClient struct {
-	BaseURL  string
-	Tin      string
-	BhfId    string
-	CmcKey   string
-	DvcSrlNo string
-	Logger   *logrus.Logger
-	Client   *http.Client
+	BaseURL    string
+	Tin        string
+	BhfId      string
+	CmcKey     string
+	DvcSrlNo   string
+	Logger     *logrus.Logger
+	Client     *http.Client
+	Validator  *validator.SchemaValidator
 }
 
 // NewVSCUClient creates a new VSCU API client
-func NewVSCUClient(baseURL, tin, bhfId, cmcKey string, logger *logrus.Logger) *VSCUClient {
+func NewVSCUClient(baseURL, tin, bhfId, cmcKey string, logger *logrus.Logger) (*VSCUClient, error) {
+	// Initialize schema validator
+	schemaValidator, err := validator.NewSchemaValidator("/home/daniel/repos/etims/etims-test/shemas", logger)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize schema validator: %w", err)
+	}
+
 	return &VSCUClient{
-		BaseURL:  baseURL,
-		Tin:      tin,
-		BhfId:    bhfId,
-		CmcKey:   cmcKey,
-		DvcSrlNo: "7ba05e23-850a-44dd-b09a-2eac8405e592",
-		Logger:   logger,
+		BaseURL:    baseURL,
+		Tin:        tin,
+		BhfId:      bhfId,
+		CmcKey:     cmcKey,
+		DvcSrlNo:   "7ba05e23-850a-44dd-b09a-2eac8405e592",
+		Logger:     logger,
+		Validator:  schemaValidator,
 		Client: &http.Client{
 			Timeout: time.Second * 480,
 			Transport: &http.Transport{
@@ -58,11 +67,37 @@ func NewVSCUClient(baseURL, tin, bhfId, cmcKey string, logger *logrus.Logger) *V
 				ExpectContinueTimeout: 1 * time.Second,
 			},
 		},
+	}, nil
+}
+
+// validateRequest validates the request against its schema before sending
+func (c *VSCUClient) validateRequest(request interface{}) error {
+	if request == nil {
+		return nil
 	}
+
+	// Get schema path for the request type
+	schemaPath := validator.GetSchemaPath(request)
+	if schemaPath == "" {
+		c.Logger.Warnf("No schema found for request type %T", request)
+		return nil
+	}
+
+	// Validate request against schema
+	if err := c.Validator.ValidateRequest(request, schemaPath); err != nil {
+		return fmt.Errorf("schema validation failed: %w", err)
+	}
+
+	return nil
 }
 
 // SendRequest sends a request to the VSCU API
 func (c *VSCUClient) SendRequest(method, endpoint string, requestBody interface{}, headers map[string]string) (*models.APIResponse, error) {
+	// Validate request body against schema
+	if err := c.validateRequest(requestBody); err != nil {
+		return nil, err
+	}
+
 	// Validate request if it implements Validator interface
 	if validator, ok := requestBody.(models.Validator); ok {
 		if err := validator.Validate(); err != nil {
