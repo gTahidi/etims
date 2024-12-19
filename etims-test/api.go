@@ -96,127 +96,51 @@ func main() {
 		logger.WithError(err).Fatal("Failed to initialize device and sync data")
 	}
 
-	// Process test data files
-	err = filepath.Walk(*testDataDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
+	// Define the order of processing
+	fileOrder := []string{
+		"branch_customer.json",
+		"item.json",
+		"stock.json",
+		"purchase.json",
+		"sales.json",
+	}
+
+	// Process files in order
+	for _, filename := range fileOrder {
+		filepath := filepath.Join(*testDataDir, filename)
+		
+		// Skip if file doesn't exist
+		if _, err := os.Stat(filepath); os.IsNotExist(err) {
+			logger.WithField("file", filepath).Info("File does not exist, skipping")
+			continue
 		}
 
-		if info.IsDir() {
-			return nil
-		}
-
-		// Process only JSON files
-		if filepath.Ext(path) != ".json" {
-			return nil
-		}
-
-		logger.WithField("file", path).Info("Processing test data file")
+		logger.WithField("file", filepath).Info("Processing test data file")
 
 		// Read and process the test data file
-		data, err := os.ReadFile(path)
+		data, err := os.ReadFile(filepath)
 		if err != nil {
 			logger.WithError(err).Error("Failed to read test data file")
-			return nil
+			continue
 		}
 
-		// Determine the request type based on the filename
-		switch filepath.Base(path) {
-		case "sales.json":
-			var salesReq models.SalesRequest
-			if err := json.Unmarshal(data, &salesReq); err != nil {
-				logger.WithError(err).Error("Failed to parse sales request data")
-				return nil
+		// Process based on file type
+		switch filename {
+		case "branch_customer.json":
+			var custReq models.BranchCustomerRequest
+			if err := json.Unmarshal(data, &custReq); err != nil {
+				logger.WithError(err).Error("Failed to parse branch customer request data")
+				continue
 			}
 
-			// Create stock movement first to validate stock levels
-			stockMovement, err := client.CreateStockMovementFromSale(data)
+			resp, err := client.SaveBranchCustomer(custReq)
 			if err != nil {
-				logger.WithError(err).Error("Failed to create stock movement - possibly insufficient stock")
-				return nil
+				logger.WithError(err).Error("Failed to send branch customer request")
+				continue
 			}
-
-			// If stock validation passed, proceed with the sale
-			resp, err := client.SaveSales(salesReq)
-			if err != nil {
-				logger.WithError(err).Error("Failed to send sales request")
-				return nil
-			}
-			logger.WithField("response", resp).Info("Sales request successful")
-			logger.WithField("stockMovement", stockMovement).Info("Stock movement created for sale")
-
-		case "purchase.json":
-			var purchaseReq models.PurchaseRequest
-			if err := json.Unmarshal(data, &purchaseReq); err != nil {
-				logger.WithError(err).Error("Failed to parse purchase request data")
-				return nil
-			}
-
-			// First save the purchase
-			resp, err := client.SavePurchase(purchaseReq)
-			if err != nil {
-				logger.WithError(err).Error("Failed to send purchase request")
-				return nil
-			}
-			logger.WithField("response", resp).Info("Purchase request successful")
-
-			// Then create stock movement for incoming stock
-			stockMovement, err := client.CreateStockMovementFromPurchase(data)
-			if err != nil {
-				logger.WithError(err).Error("Failed to create stock movement for purchase")
-				return nil
-			}
-			logger.WithField("stockMovement", stockMovement).Info("Stock movement created for purchase")
-
-		case "stock.json":
-			// First try to parse as array
-			var stockReqArray []models.StockRequest
-			if err := json.Unmarshal(data, &stockReqArray); err != nil {
-				// If array parsing fails, try single object
-				var singleStockReq models.StockRequest
-				if err := json.Unmarshal(data, &singleStockReq); err != nil {
-					logger.WithError(err).Error("Failed to parse stock request data as array or single object")
-					return nil
-				}
-				stockReqArray = []models.StockRequest{singleStockReq}
-			}
-
-			// Process each stock request
-			for _, req := range stockReqArray {
-				// Ensure required fields are set for each item
-				for i := range req.ItemList {
-					// Initialize discount fields if not set
-					if req.ItemList[i].DcRt == 0 {
-						req.ItemList[i].DcRt = 0
-					}
-					if req.ItemList[i].DcAmt == 0 {
-						req.ItemList[i].DcAmt = 0
-					}
-					if req.ItemList[i].TotDcAmt == 0 {
-						req.ItemList[i].TotDcAmt = 0
-					}
-
-					// Set stock type based on SAR type
-					if req.SarTyCd == "01" { // Stock In
-						req.ItemList[i].StockTyCd = "01" // Stock In
-					} else if req.SarTyCd == "02" { // Stock Out
-						req.ItemList[i].StockTyCd = "02" // Stock Out
-						// For stock out, make quantity negative
-						req.ItemList[i].Qty = -math.Abs(req.ItemList[i].Qty)
-					}
-				}
-
-				// Send stock request
-				resp, err := client.SaveStock(req)
-				if err != nil {
-					logger.WithError(err).Error("Failed to send stock request")
-					continue
-				}
-				logger.WithField("response", resp).Info("Stock request successful")
-			}
+			logger.WithField("response", resp).Info("Branch customer request successful")
 
 		case "item.json":
-			// Parse items list
 			var itemsList struct {
 				Tin   string               `json:"tin"`
 				BhfId string               `json:"bhfId"`
@@ -224,12 +148,10 @@ func main() {
 			}
 			if err := json.Unmarshal(data, &itemsList); err != nil {
 				logger.WithError(err).Error("Failed to parse items list")
-				return nil
+				continue
 			}
 
-			// Register each item individually
 			for _, item := range itemsList.Items {
-				// Send item request
 				resp, err := client.SaveItem(item)
 				if err != nil {
 					logger.WithError(err).Error("Failed to send item request")
@@ -241,28 +163,87 @@ func main() {
 				}).Info("Item registration successful")
 			}
 
-		case "branch_customer.json":
-			var custReq models.BranchCustomerRequest
-			if err := json.Unmarshal(data, &custReq); err != nil {
-				logger.WithError(err).Error("Failed to parse branch customer request data")
-				return nil
+		case "stock.json":
+			var stockReqArray []models.StockRequest
+			if err := json.Unmarshal(data, &stockReqArray); err != nil {
+				var singleStockReq models.StockRequest
+				if err := json.Unmarshal(data, &singleStockReq); err != nil {
+					logger.WithError(err).Error("Failed to parse stock request data")
+					continue
+				}
+				stockReqArray = []models.StockRequest{singleStockReq}
 			}
 
-			// Send branch customer request
-			resp, err := client.SaveBranchCustomer(custReq)
+			for _, req := range stockReqArray {
+				for i := range req.ItemList {
+					if req.ItemList[i].DcRt == 0 {
+						req.ItemList[i].DcRt = 0
+					}
+					if req.ItemList[i].DcAmt == 0 {
+						req.ItemList[i].DcAmt = 0
+					}
+					if req.ItemList[i].TotDcAmt == 0 {
+						req.ItemList[i].TotDcAmt = 0
+					}
+
+					if req.SarTyCd == "01" {
+						req.ItemList[i].StockTyCd = "01"
+					} else if req.SarTyCd == "02" {
+						req.ItemList[i].StockTyCd = "02"
+						req.ItemList[i].Qty = -math.Abs(req.ItemList[i].Qty)
+					}
+				}
+
+				resp, err := client.SaveStock(req)
+				if err != nil {
+					logger.WithError(err).Error("Failed to send stock request")
+					continue
+				}
+				logger.WithField("response", resp).Info("Stock request successful")
+			}
+
+		case "purchase.json":
+			var purchaseReq models.PurchaseRequest
+			if err := json.Unmarshal(data, &purchaseReq); err != nil {
+				logger.WithError(err).Error("Failed to parse purchase request data")
+				continue
+			}
+
+			resp, err := client.SavePurchase(purchaseReq)
 			if err != nil {
-				logger.WithError(err).Error("Failed to send branch customer request")
-				return nil
+				logger.WithError(err).Error("Failed to send purchase request")
+				continue
+			}
+			logger.WithField("response", resp).Info("Purchase request successful")
+
+			stockMovement, err := client.CreateStockMovementFromPurchase(data)
+			if err != nil {
+				logger.WithError(err).Error("Failed to create stock movement for purchase")
+				continue
+			}
+			logger.WithField("stockMovement", stockMovement).Info("Stock movement created for purchase")
+
+		case "sales.json":
+			var salesReq models.SalesRequest
+			if err := json.Unmarshal(data, &salesReq); err != nil {
+				logger.WithError(err).Error("Failed to parse sales request data")
+				continue
 			}
 
-			logger.WithField("response", resp).Info("Branch customer request successful")
+			stockMovement, err := client.CreateStockMovementFromSale(data)
+			if err != nil {
+				logger.WithError(err).Error("Failed to create stock movement - possibly insufficient stock")
+				continue
+			}
+
+			resp, err := client.SaveSales(salesReq)
+			if err != nil {
+				logger.WithError(err).Error("Failed to send sales request")
+				continue
+			}
+			logger.WithField("response", resp).Info("Sales request successful")
+			logger.WithField("stockMovement", stockMovement).Info("Stock movement created for sale")
 		}
-
-		return nil
-	})
-
-	if err != nil {
-		logger.WithError(err).Fatal("Failed to process test data files")
 	}
 }
 

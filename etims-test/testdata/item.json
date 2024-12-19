@@ -121,6 +121,35 @@
             "regrNm": "Admin",
             "modrId": "Admin",
             "modrNm": "Admin"
+        },
+        {
+            "itemCd": "KE1NTXU0000005",
+            "itemClsCd": "15101504",
+            "itemTyCd": "1",
+            "itemNm": "Aviation Fuel",
+            "itemStdNm": "Aviation Jet Fuel",
+            "orgnNatCd": "KE",
+            "pkgUnitCd": "JY",
+            "qtyUnitCd": "L",
+            "taxTyCd": "B",
+            "bcdRate": 0,
+            "dtyPrc": 210.50,
+            "dftPrc": 210.50,
+            "regulator": "KRA",
+            "batchNo": "BATCH001",
+            "itemExprDt": "20251215",
+            "itemSrno": "SN001",
+            "grpPrcL1": 210.50,
+            "grpPrcL2": 210.50,
+            "grpPrcL3": 210.50,
+            "grpPrcL4": 210.50,
+            "addInfo": "AVF-002",
+            "useYn": "Y",
+            "isrcAplcbYn": "N",
+            "regrId": "Admin",
+            "regrNm": "Admin",
+            "modrId": "Admin",
+            "modrNm": "Admin"
         }
     ]
 }

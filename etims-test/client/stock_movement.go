@@ -358,7 +358,13 @@ func (c *VSCUClient) GetCurrentStock(itemCd string) (float64, error) {
 	for _, mov := range movements {
 		for _, item := range mov.ItemList {
 			if item.ItemCd == itemCd {
-				currentQty += item.Qty // Will add for stock in, subtract for stock out (due to negative quantities)
+				// For stock in (type 01), add the quantity
+				// For stock out (type 02), subtract the quantity
+				if item.StockTyCd == "01" {
+					currentQty += item.Qty
+				} else if item.StockTyCd == "02" {
+					currentQty -= math.Abs(item.Qty) // Use absolute value since qty is already negative
+				}
 			}
 		}
 	}
@@ -383,6 +389,41 @@ func (c *VSCUClient) ValidateStockAvailability(sale models.SalesRequest) error {
         return fmt.Errorf("failed to query stock movements: %w", err)
     }
 
+    // If no stock found, try to load from local file
+    if resp.ResultCd == "001" {
+        movements, err := c.LoadStockMovements()
+        if err != nil {
+            return fmt.Errorf("failed to load local stock movements: %w", err)
+        }
+
+        // Calculate current stock from local movements
+        stockLevels := make(map[string]float64)
+        for _, mov := range movements {
+            for _, item := range mov.ItemList {
+                // For stock in (type 01), add the quantity
+                // For stock out (type 02), subtract the quantity
+                if item.StockTyCd == "01" {
+                    stockLevels[item.ItemCd] += item.Qty
+                } else if item.StockTyCd == "02" {
+                    stockLevels[item.ItemCd] -= item.Qty
+                }
+            }
+        }
+
+        // Validate each item in the sale
+        for _, item := range sale.ItemList {
+            currentStock, exists := stockLevels[item.ItemCd]
+            if !exists {
+                return fmt.Errorf("item %s not found in stock", item.ItemCd)
+            }
+            if currentStock < item.Qty {
+                return fmt.Errorf("insufficient stock for item %s: have %.2f, need %.2f", 
+                    item.ItemCd, currentStock, item.Qty)
+            }
+        }
+        return nil
+    }
+
     if resp.ResultCd != "000" {
         return fmt.Errorf("failed to query stock movements: %s", resp.ResultMsg)
     }
@@ -391,8 +432,9 @@ func (c *VSCUClient) ValidateStockAvailability(sale models.SalesRequest) error {
     var stockResp struct {
         Data struct {
             StockList []struct {
-                ItemCd string  `json:"itemCd"`
-                Qty    float64 `json:"qty"`
+                ItemCd     string  `json:"itemCd"`
+                Qty       float64 `json:"qty"`
+                StockTyCd string  `json:"stockTyCd"`
             } `json:"stockList"`
         } `json:"data"`
     }
@@ -410,7 +452,13 @@ func (c *VSCUClient) ValidateStockAvailability(sale models.SalesRequest) error {
     // Create a map of current stock levels
     stockLevels := make(map[string]float64)
     for _, item := range stockResp.Data.StockList {
-        stockLevels[item.ItemCd] = item.Qty
+        // For stock in (type 01), add the quantity
+        // For stock out (type 02), subtract the quantity
+        if item.StockTyCd == "01" {
+            stockLevels[item.ItemCd] += item.Qty
+        } else if item.StockTyCd == "02" {
+            stockLevels[item.ItemCd] -= item.Qty
+        }
     }
 
     // Validate each item in the sale

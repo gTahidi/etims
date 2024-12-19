@@ -1,0 +1,34 @@
+{
+    "tin": "P052248771P",
+    "bhfId": "00",
+    "items": [
+        {
+            "itemCd": "KE1NTXU0000003",
+            "itemClsCd": "15101506",
+            "itemNm": "Petrol",
+            "pkgUnitCd": "JY",
+            "qtyUnitCd": "L",
+            "qty": 120000,
+            "splyAmt": 23490000,
+            "prc": 195.75,
+            "regrId": "Admin",
+            "regrNm": "Admin",
+            "modrId": "Admin",
+            "modrNm": "Admin"
+        },
+        {
+            "itemCd": "KE1NTXU0000004",
+            "itemClsCd": "15101507",
+            "itemNm": "Kerosene",
+            "pkgUnitCd": "JY",
+            "qtyUnitCd": "L",
+            "qty": 50000,
+            "splyAmt": 9597500,
+            "prc": 191.95,
+            "regrId": "Admin",
+            "regrNm": "Admin",
+            "modrId": "Admin",
+            "modrNm": "Admin"
+        }
+    ]
+}
