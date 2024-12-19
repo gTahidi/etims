@@ -310,6 +310,20 @@ func (c *VSCUClient) SavePurchaseConfirmation(confirmation models.PurchaseConfir
 	return c.SendRequest("POST", "/trnsPurchase/savePurchaseConfirmation", confirmation, nil)
 }
 
+// Purchase Management Endpoints
+func (c *VSCUClient) SavePurchase(purchase models.PurchaseRequest) (*models.APIResponse, error) {
+	return c.SendRequest("POST", "/trnsPurchase/savePurchases", purchase, nil)
+}
+
+func (c *VSCUClient) GetPurchases(lastReqDt string) (*models.APIResponse, error) {
+	req := models.CodeListRequest{
+		Tin:       c.Tin,
+		BhfId:     c.BhfId,
+		LastReqDt: lastReqDt,
+	}
+	return c.SendRequest("POST", "/trnsPurchase/selectTrnsPurchaseSales", req, nil)
+}
+
 // Helper function to get current timestamp in required format
 func (c *VSCUClient) GetCurrentTimestamp() string {
 	return time.Now().Format("20060102150405")

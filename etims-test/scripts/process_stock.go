@@ -13,26 +13,26 @@ import (
 
 // StockData represents the structure for stock data
 type StockData struct {
-	Tin         string            `json:"tin"`
-	BhfId       string            `json:"bhfId"`
-	SarNo       int               `json:"sarNo"`
-	OrgSarNo    int               `json:"orgSarNo"`
-	RegTyCd     string            `json:"regTyCd"`
-	CustTin     string            `json:"custTin"`
-	CustNm      string            `json:"custNm"`
-	CustBhfId   string            `json:"custBhfId"`
-	SarTyCd     string            `json:"sarTyCd"`
-	OcrnDt      string            `json:"ocrnDt"`
-	StockRlsDt  string            `json:"stockRlsDt"`
-	TotItemCnt  int               `json:"totItemCnt"`
-	TotTaxblAmt float64           `json:"totTaxblAmt"`
-	TotTaxAmt   float64           `json:"totTaxAmt"`
-	TotAmt      float64           `json:"totAmt"`
-	Remark      string            `json:"remark"`
-	RegrId      string            `json:"regrId"`
-	RegrNm      string            `json:"regrNm"`
-	ModrId      string            `json:"modrId"`
-	ModrNm      string            `json:"modrNm"`
+	Tin         string             `json:"tin"`
+	BhfId       string             `json:"bhfId"`
+	SarNo       int                `json:"sarNo"`
+	OrgSarNo    int                `json:"orgSarNo"`
+	RegTyCd     string             `json:"regTyCd"`
+	CustTin     string             `json:"custTin"`
+	CustNm      string             `json:"custNm"`
+	CustBhfId   string             `json:"custBhfId"`
+	SarTyCd     string             `json:"sarTyCd"`
+	OcrnDt      string             `json:"ocrnDt"`
+	StockRlsDt  string             `json:"stockRlsDt"`
+	TotItemCnt  int                `json:"totItemCnt"`
+	TotTaxblAmt float64            `json:"totTaxblAmt"`
+	TotTaxAmt   float64            `json:"totTaxAmt"`
+	TotAmt      float64            `json:"totAmt"`
+	Remark      string             `json:"remark"`
+	RegrId      string             `json:"regrId"`
+	RegrNm      string             `json:"regrNm"`
+	ModrId      string             `json:"modrId"`
+	ModrNm      string             `json:"modrNm"`
 	StockItems  []models.StockItem `json:"itemList"`
 }
 

@@ -145,6 +145,29 @@ func main() {
 			logger.WithField("response", resp).Info("Sales request successful")
 			logger.WithField("stockMovement", stockMovement).Info("Stock movement created for sale")
 
+		case "purchase.json":
+			var purchaseReq models.PurchaseRequest
+			if err := json.Unmarshal(data, &purchaseReq); err != nil {
+				logger.WithError(err).Error("Failed to parse purchase request data")
+				return nil
+			}
+
+			// First save the purchase
+			resp, err := client.SavePurchase(purchaseReq)
+			if err != nil {
+				logger.WithError(err).Error("Failed to send purchase request")
+				return nil
+			}
+			logger.WithField("response", resp).Info("Purchase request successful")
+
+			// Then create stock movement for incoming stock
+			stockMovement, err := client.CreateStockMovementFromPurchase(data)
+			if err != nil {
+				logger.WithError(err).Error("Failed to create stock movement for purchase")
+				return nil
+			}
+			logger.WithField("stockMovement", stockMovement).Info("Stock movement created for purchase")
+
 		case "stock.json":
 			// First try to parse as array
 			var stockReqArray []models.StockRequest
