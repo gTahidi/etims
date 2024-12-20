@@ -1,0 +1,2827 @@
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+TECHNICAL SPECIFICATION OF TRADER INVOICING SYSTEM (TIS) FOR
+ONLINE AND VIRTUAL SALES CONTROL UNIT (OSCU & VSCU) v2.0
+
+Introduction
+Kenya Revenue Authority is currently using an Integrated Software that collects and manages
+domestic tax revenues. The said tax system handles the internal taxpayer registry and other
+tax processes but doesn’t manage taxpayers’ business transactions as they occur in real time.
+The Electronic Tax Invoice Management System has introduced a supply chain management
+capability and integration with other KRA systems.
+Area of application
+KRA seeks to introduce the usage of Online and Virtual Sales Control Unit (OSCU & VSCU)
+capable of handling a richer dataset than the traditional Electronic Tax Register system. This
+guideline includes specific requirements concerning the Trader Invoicing System
+to be used together with an Online or Virtual Sales Control Unit.
+Definitions
+●
+
+“Authority” means Kenya Revenue Authority
+
+●
+
+“User” means a taxpayer, user of Trader Invoicing System (TIS)
+
+●
+
+“PIN” – Personal Identification Number
+
+●
+
+“Commissioner General” means the Commissioner General of Kenya Revenue
+Authority;
+
+●
+
+“Electronic Tax Invoicing Management System” means a system comprising of
+Trader Invoicing System and Online/Virtual Sales Control Unit connected together;
+
+●
+
+“Trader Invoicing System (TIS)” means a system designated for use in business for
+efficiency management controls in areas of invoicing and stock management;
+
+●
+
+“Receipt” means a Tax Invoice or a receipt for the provision of goods/ services
+provided to the customer (as applicable);
+
+●
+
+“Signature” means receipt data used for integrity verification by Authority;
+
+●
+
+An “Online & Virtual Sales Control Unit (OSCU & VSCU)” is a software module
+communicating with both the TIS and the Authority for processing receipts;
+
+●
+
+“Receipt data” means every receipt data provided by TIS which needs to be processed
+by OSCU/VSCU;
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 1 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+●
+
+“Response data” means every information sent from OSCU/VSCU to TIS;
+
+●
+
+“Internal data” means encrypted information related to the current receipt and saved
+to internal storage of OSCU/VSCU;
+
+●
+
+“OSCU/VSCU serial number” - Virtual Sales Control Unit unique serial number with
+designation of its certificate;
+
+●
+
+“Remote verification” - function of OSCU/VSCU to establish two-way communication
+with remote server designated by the Authority in order to transfer required
+information.
+
+●
+
+“Local verification” - function of OSCU/VSCU to provide information from its
+internal memory to a removable storage media;
+
+●
+
+“POS” - Point of Sale.
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 2 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+TIS specification for Virtual SCU
+A Trader Invoicing System (TIS) can be any electronic cash register, any terminal with
+cash register software, any computer using invoicing software, or any other similar system
+used for registration of outbound transactions.
+
+1.
+
+A TIS shall not be able to receive importation and purchase data or produce invoices
+unless connected to a functional Virtual Sales Control Unit assigned for the same PIN. This
+OSCU/VSCU preserves in an irrevocable and secure manner all relevant data of the
+outbound transactions, uses this data to calculate an encrypted value that must be printed on
+the final receipt, in accordance with this guideline.
+
+2.
+
+A Trader Invoicing System shall generate receipts, which must show, among others, the
+data enumerated in Items ‘a’ to ‘n’ of this Article as minimum required information:
+
+3.
+
+a. Taxpayer’s name;
+b. Personal Identification Number;
+c. the address at which the sale takes place;
+d. Personal Identification number of the buyer;
+e. receipt type and transaction type;
+f. serial number of the receipt from an uninterrupted ascending number series
+per
+receipt type;
+g. registered items and/or services with description, quantity, price, with any
+other action that may be done such as cancellations, corrections;
+h. total sales amount;
+i. tax rates applied;
+j. the value added tax added to the sale amount;
+k. means of payment;
+l. SCU information:
+i.
+
+Date and time stamped by OSCU/VSCU;
+
+ii. Sequential receipt type number;
+iii. Receipt signatures;
+iv. OSCU/VSCU identification number;
+m. Date and time stamped by TIS;
+4. Each receipt issued by Trader Invoicing System is formed from a combination of receipt type
+
+and transaction type.
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 3 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+4.1.
+
+Receipt types are:
+4.1.1. NORMAL
+4.1.2. COPY
+4.1.3. TRAINING
+4.1.4. PROFORMA
+
+4.2.
+
+Each receipt type is attributed with one of the following transaction types:
+4.2.1. SALE;
+4.2.2. CREDIT NOTE.
+4.2.3. DEBIT NOTE
+
+Trader Invoicing System shall assign a unique receipt label to each combination of
+receipt type and transaction, so that the Virtual Sales Control Unit can interpret them
+unambiguously. The table below gives the combinations of receipt labels:
+
+4.3.
+
+RECEIPT TYPE
+
+TRANSACTION TYPE
+
+RECEIPT LABEL
+
+NORMAL
+
+SALES
+
+NS
+
+NORMAL
+
+CREDIT NOTE
+
+NC
+
+COPY
+
+SALES
+
+CS
+
+COPY
+
+CREDIT NOTE
+
+CC
+
+TRAINING
+
+SALES
+
+TS
+
+TRAINING
+
+CREDIT NOTE
+
+TC
+
+PROFORMA
+
+SALES
+
+PS
+
+5. For the purpose of signing an invoice, the data flow between the Trader Invoicing System
+
+and the Virtual Sales Control Unit will be as follows for each receipt type:
+5.1.
+
+the TIS sends the following receipt data to the OSCU/VSCU at the time when the
+receipt is being produced:
+
+5.1.1. date and time;
+5.1.2. Personal Identification Number;
+5.1.3. Buyer's PIN (Optional);
+5.1.4. receipt number;
+5.1.5. receipt type and transaction type;
+5.1.6. tax rates;
+5.1.7. total amounts with tax;
+5.1.8. tax amounts.
+5.2. the OSCU/VSCU receives receipt data from TIS
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 4 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+5.3.
+
+the OSCU/VSCU generates the following response data and sends it back to the
+TIS:
+
+5.3.1. SCU ID;
+5.3.2. date and time;
+5.3.3. receipt label;
+5.3.4. receipt counter per receipt type;
+5.3.5. receipt counter of all receipts;
+5.3.6. digital signatures (except for the receipt types TRAINING and PROFORMA);
+5.4.
+
+the TIS finalizes receipt by printing OSCU/VSCU information on designated place
+within the receipt.
+
+5.5.
+
+the TIS sends complete journal data of NS and NC receipt labels in text form to
+OSCU/VSCU.
+
+6. TIS shall:
+6.1.
+
+contain software (PC software or firmware) that controls the functions indicated in
+this document;
+
+6.2.
+
+have reprogrammable PIN under its service mode, for the purpose of ownership
+transfer, only if the change of PIN is conditioned by the reset which deletes all
+information saved
+for previously programmed PIN;
+
+6.3.
+
+carry consecutive numbers in order to guarantee the completeness and the
+inalterability of the journal records. This means that the journal records in the
+electronic journal or the journal file (which includes all receipts of the various
+types, among other things) shall have maximum one ascending numbering per
+receipt type. In case of a total reset of the Trader Invoicing System, the
+aforementioned numbering shall recommence from the next number in the
+sequence as retrieved from the last transmitted invoice.
+
+6.4.
+
+have display screen showing the inputs and outputs of the sale with 2 decimal
+places;
+
+6.5.
+
+be able to produce Z daily report and X daily report. Z daily report refers to the
+summary of sales of a full day (from 00:00:00 to 23:59:59) of operations. X daily
+report refers to the summary of sales operations from the last Z report to the
+present;
+
+6.6.
+
+be issued with a version number which is a unique identifier of the software version
+and should be adapted for every change made to the software. TIS software version
+must be enabled for verification by Authority personnel;
+
+6.7.
+
+be able to issue receipts only if connected to OSCU/VSCU unit which is functioning
+under normal circumstances;
+
+6.8.
+
+be able to independently detect whether the OSCU/VSCU is operational or not, and
+inform user of its status in case of error;
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 5 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+6.9.
+
+not have any other functions than those stipulated in its documentation. The
+documentation shall be written in English and accompany the TIS on delivery;
+
+6.10. have an inventory control, where the user is able to input and/or remove goods
+
+from stock and produce independent reports showing inventory status;
+6.11. be able to register cash deposits and withdrawals;
+6.12. be able to register a payment with different means of payment;
+6.13. be equipped with paper journal or electronic journal or the log file which contains
+
+all the sales that immediately upon the creation of any printed material are
+recorded and shall not operate without it;
+6.14. not to be constructed in such a way that it is possible to register a sales amount
+
+without simultaneously printing a receipt;
+6.15. not be able to register the amount of a transaction without identifying the good and
+
+/or service;
+6.16. not be able to correct a transaction without prior cancelation of the original
+
+transaction. Each cancelation must refer to the original erroneous SCU Receipt
+number. Moreover, an original transaction is allowed to be cancel only once;
+6.17. print only one original receipt. Reprint shall have a watermark with mention Copy.
+6.18. send receipt data to OSCU/VSCU in prescribed format defined in this guideline;
+6.19. receive response data from OSCU/VSCU and add this information to final receipt
+
+structure;
+6.20. allow, as programming/servicing function, input of:
+6.20.1.
+
+PIN,
+
+6.20.2.
+
+Registered company name and address,
+
+6.20.3.
+
+Date and time,
+
+6.20.4.
+
+TAX rates, labeled as: "A", “B”, "C", "D" and “E” corresponding to
+
+indexes 1-5.
+6.21. print each tax rate programmed with value > 0. The tax label and value must be
+
+appearing on every receipt even though the sale was not including that particular
+tax rate;
+6.22. print the tax label and value for tax rate equal to zero, only when an item with this
+
+particular tax rate is used;
+6.23. enable to print in a uniform layout response data received from OSCU/VSCU
+
+structured with following content:
+6.23.1. The designation "SCU Information"
+6.23.2.Time and date of OSCU/VSCU (Date: dd/mm/yyyy Time: hh:mm:ss)
+6.23.3. OSCU/VSCU identification "CU ID: KRACU04XXXXXXXX"
+6.23.4.CU Invoice Number containing the CU ID and a sequential receipt number
+
+separated by a backslash symbol e.g. KRACU04XXXXXXXX/1
+6.23.5. Receipt counter "A/B RT"
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 6 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+6.23.6.Internal data separate by dash after every 4th character
+6.23.7. Receipt signature separate by dash after every 4th character
+
+QR Code: made by invoice_date(ddmmyyyy)#time(hhmmss)#cu
+number#cu_receipt_number#internal_data#receipt_signature
+
+6.23.8.
+
+6.24. provide to authorized officers an interface for verification purposes, including an
+
+overview of software settings and database;
+6.25. have an item counter which presents the number of items shown on the receipt
+6.26.
+
+(excluding voids);
+
+6.27. continue or re-print last line in the case of power failure or after missing paper
+
+recovery
+6.28. print official KRA logo on each receipt regardless the type.
+6.29. not issue a receipt of goods when the corresponding stock is less than the requested
+
+quantity. However, TIS can issue a receipt for service item regardless the stock.
+6.30. be able to provide a closing stock of a given date by user.
+7. Host Devices Compliance- Shall be approved by Kenya Bureau of Standards or compliant
+
+with the international safety standards for electronic equipment
+8. The Trader Invoicing System functionalities shall not be affected or interrupted by any other
+
+accessory or electronic equipment connected to the same host device.
+Receipt Specification
+10. Trader Invoicing System shall not be able to print receipt of any type before the
+aforementioned data flow has been finalized. This means that it shall be impossible to issue
+receipt if the TIS did not receive any response from the OSCU/VSCU.
+11. When the TIS provides a function for printing copies of the receipt, training or proforma
+tickets, it must be clearly distinguishable from the NORMAL receipt type. The designation
+COPY, TRAINING, PROFORMA has to be placed on the invoice below receipt header and
+above item description section and as a watermark. Moreover, in such cases the following
+text should appear below the amount totals of the ticket: "THIS IS NOT AN OFFICIAL
+RECEIPT”. These identifying texts shall be at least twice bigger than the text that indicates
+the amount.
+12. All corrections on the receipt should be performed before approving it.
+13. Normal Sale, defined by receipt label NS, refers to a receipt that shall be produced and
+offered to the client. It is understood to be any receipt produced while the Electronic Tax
+Invoice Management System is in its normal registration mode, used to register sales of
+goods and/or services, including corrections and discounts.
+Note That: The format of the Invoice is at the discretion of the trader. It must, however,
+contain all the prescribed fields as indicated in the sample below.
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 7 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+Normal Invoice
+TAXPAYER'S NAME
+
+Trade Name
+Address, City
+PIN: P000000000Z
+
+Shop address
+Personal Identification number
+
+TAX INVOICE
+-------------------------------------------------Commercial message
+Welcome to our shop
+Buyer's Personal Identification Number (optional)
+Buyer PIN: A000000000Z
+-------------------------------------------------Plain Bread
+Item description, unit price, quantity, total price
+1000.00x
+1.00
+1000.00A-EX
+and tax designation
+Gouda cheese
+33600.00x
+0.200
+6,720.00B
+Discount percentage, total price with
+Discount narration and value: 25%
+(1,680.00) discount
+Display negative value of the total discount given
+Wriggly gum
+60.00x
+5.00
+300.00B
+----------------------------------------------------TOTAL BEFORE DISCOUNT
+8020.00 Total amount computed before discount
+TOTAL DISCOUNT AWARDED
+(1680.00) Total TAX exempted amount
+SUB TOTAL
+5,485.60 Total amount without Tax
+VAT
+854.40 Total amount of TAX to be paid
+TOTAL
+6340.00 Total price to be paid
+------------------------------------------------CASH
+6340.00
+Payment method
+ITEMS NUMBER
+3
+Number of items sold
+-----------------------------------------------Rate
+EX
+16%
+0%
+Non-VAT
+8%
+
+Taxable
+Amount
+1000.00
+5,485.6
+0.00
+0.00
+0.00
+
+VAT
+0.00
+854.40
+0.00
+0.00
+0.00
+
+Tabular presentation of the various tax components
+Goods exempted from VAT
+VAT at 16%
+Zero rated goods
+Non Vatable goods
+VAT at 8%
+
+-----------------------------------------------SCU INFORMATION
+Date: 25/01/2023
+Time: 11:07:35 Date and time originated from OSCU/VSCU
+OSCU/VSCU Serial number
+SCU ID: KRACU0100000001
+Receipt number originated from OSCU/VSCU
+CU INVOICE NO.: {SCU ID}/Receipt Number
+Internal data (separate by dash)
+Internal Data:
+Receipt signature (separate by dash)
+TE68-SLA2-34J5-EAV3-N569-88LJ-Q7
+Receipt Signature:
+V249-J39C-FJ48-HE2W
+QR Code
+(https://etims.kra.go.ke/common/link/etims/receipt/indexEti
+msReceptData?{KRA-PIN+BHF-ID+RcpSignture)
+---------------------------------------------TIS INFORMATION
+(Optional category for TIS specific info in OSCU and VSCU)
+RECEIPT NUMBER:
+152 Receipt number originated from TIS
+DATE: 25/01/2023
+TIME: 11:07:36 Date and time originated from TIS
+-------------------------------------------THANK YOU
+Commercial message
+
+WE LOOK FORWARD TO EARNING YOUR
+BUSINESS
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 8 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+14. Normal Credit Note, defined by receipt label NC, refers to a receipt that shall be
+produced, while Electronic Tax Invoice Management system is in credit mode, for a client
+upon request with information indicating that a previously printed Normal Sale receipt
+contains incorrect information or information on a refund for returned or discounted goods
+or services. Such credit note contains only negative, credit note amounts. Each receipt of
+this type requires a statement by user inputted to a special credit note log book containing
+receipt details and justification with description and the name of the credit note recipient.
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 9 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+14.1. Following is an example of receipt type NORMAL and transaction type CREDIT NOTE
+(NC)
+
+Trade Name
+Address, City
+PIN: P000000000Z
+-------------------------------------------------CREDIT NOTE
+ORIGINAL CU INVOICE NO.#: NNNN
+
+TAXPAYER'S NAME
+Shop address
+Personal Identification number
+
+--------------------------------------------------
+
+TITLE for CREDIT NOTE
+
+CREDIT NOTE IS APPROVED ONLY
+FOR ORIGINAL SALES RECEIPT
+Buyer PIN: A000000000Z
+
+Original number based on which refund is issued
+(SCU receipt number)
+
+-------------------------------------------------Gravel /t
+9000.00x
+
+5.354
+
+B -25%
+
+-48186.00
+-36139.50
+
+----------------------------------------------------TOTAL
+-36139.50
+TOTAL B-16.00%
+-36139.50
+TOTAL TAX B
+-5512.81
+TOTAL TAX
+-5512.81
+------------------------------------------------CASH
+-36139.50
+ITEMS NUMBER
+1
+-----------------------------------------------SCU INFORMATION
+Date: 25/01/2023
+CU ID:
+
+Buyer’s Personal Identification Number
+(Optional)
+
+Item description, unit price, quantity, total price
+in NEGATIVE amount and tax designation
+Reduction of price in percentage and total
+amount
+
+Total amount of credit note (negative amount)
+Total amount with TAX (negative amount)
+Total amount of TAX per tax rate (negative)
+Total amount of TAX (negative)
+Payment method (negative amount)
+Number of items
+
+Time: 11:48:27
+KRACU0499999999
+
+Invoice No.: KRACU0499999999/259 NC
+
+Date and time originated from OSCU/VSCU
+
+Internal Data:
+
+OSCU/VSCU Serial
+
+IR84-99TN-FCYY-CE22-4HWE-V5TA-EE
+
+Receipt number originated from OSCU/VSCU
+
+Receipt Signature:
+669X-TBMM-GPE4-445D
+
+---------------------------------------------TIS INFORMATION
+RECEIPT NUMBER: 153
+DATE: 25/01/2023
+TIME: 11:50:24
+-------------------------------------------THANK YOU
+
+number
+
+Internal data (separate by dash)
+Receipt signature (separate by dash)
+
+(Optional category for TIS specific info in OSCU and
+VSCU)
+Receipt number originated from TIS
+Date and time originated from TIS
+
+Commercial message
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 10 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 11 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+Trader Invoicing System shall have facility to generate detailed X daily report of the day's
+sale during which financial transactions were conducted since the previous Z daily report was
+generated.
+15.1. Daily X report is produced by TIS and represents a summary of all sales records since
+the end of the previous Z daily report and it shall at least contain information on:
+15.1.1. trade name and Personal identification number;
+15.1.2. date and time;
+15.1.3. information showing this is an X daily report;
+15.1.4. TIS designation;
+15.1.5. total sales amount for all sales receipts labeled as NS, including tax;
+15.1.6. total sales amount for all sales receipts labeled as NS, including tax, for the
+different main groups if main groups are used;
+15.1.7. number of sales receipts labeled as NS;
+15.1.8. total credit note amount for all credit note receipts labeled as NC, including tax;
+15.1.9. number of credit notes receipts labeled as NC;
+15.1.10. taxable amounts per applicable tax rates divided between sales (NS) and credit
+notes (NC);
+15.1.11. tax amounts per applicable tax rates divided between sales (NS) and credit notes
+(NC);
+15.1.12. opening deposit;
+15.1.13. number of items sold;
+15.1.14. number of receipt copies labeled as CS or CC and amount with tax included;
+15.1.15. number of receipts in training mode labeled as TS or TC and amount with tax
+included;
+15.1.16. number of advance receipts in proforma mode labeled as PS and amount with tax
+included;
+15.1.17. sales total divided according to means of payment for sales (NS) and credit notes
+(NC) receipts;
+15.1.18. all discounts;
+15.1.19. other registrations that have reduced the day's sales and their amount;
+15.1.20. number of incomplete sales.
+
+16. Trader Invoicing System shall have facility to generate detailed Z daily report at the end of each
+day during which financial transactions were conducted and certified receipts generated. This
+report will be regarded as a business and accounting record.
+16.1. Daily Z report produced by TIS represents a summary of all registrations suitable for
+
+account of a day's sale and shall at least contain information on:
+16.1.1. trade name and tax identification number;
+16.1.2. date and time;
+16.1.3. information showing this is an Z daily report;
+16.1.4. TIS designation;
+16.1.5. total sales amount for all sales receipts labeled as NS, including tax;
+16.1.6. total sales amount for all sales receipts labeled as NS, including tax, for the
+different main groups if main groups are used;
+16.1.7. number of sales receipts labeled as NS;
+16.1.8. total credit note amount for all credit note receipts labeled as NC, including tax;
+16.1.9. number of credit notes receipts labeled as NC;
+16.1.10. taxable amounts per applicable tax rates divided between sales (NS) and credit
+notes (NC);
+16.1.11. tax amounts per applicable tax rates divided between sales (NS) and credit notes
+(NC);
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+Page 12 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+16.1.12. opening deposit;
+16.1.13. number of items sold;
+16.1.14. number of receipt copies labeled as CS or CC and amount with tax included;
+16.1.15. number of receipts in training mode labeled as TS or TC and amount with tax
+
+included;
+16.1.16. number of advance receipts in proforma mode labeled as PS and amount with tax
+included;
+16.1.17. sales total divided according to means of payment for sales (NS) and credit note
+(NC) receipts;
+16.1.18. all discounts;
+16.1.19. other registrations that have reduced the day's sales and their amount;
+16.1.20. number of incomplete sales.
+17. When no report or only one of the above mentioned reports has been generated, the next report
+shall contain all the data for the entire period (from the time of the previous Z daily report to the
+time of the new report).
+18. PLU report contains full details of each item, the quantities sold and the amounts collected for
+each item and category according to the user chosen interval of date.
+18.1. PLU report shall at least contain information on:
+18.1.1. company name and tax identification number;
+18.1.2. interval date and time;
+18.1.3. information showing this is an PLU report;
+18.1.4. TIS designation;
+18.1.5. item code, item name, unit price, tax rate, quantity on sold;
+18.1.6. Remain quantity in stock.
+
+Communication Protocol between TIS and OSCU/VSCU
+19. Trader Invoicing System (CIS) shall connect to the Online and Virtual Sales Control Unit
+(OSCU/VSCU) via a web service API (SOAP or REST) or any other application service
+communication protocol available to the TIS and supported by the OSCU/VSCU;
+Communication Flow between TIS and OSCU/VSCU
+20. TIS sends a message containing a command for the OSCU/VSCU.
+21. OSCU/VSCU executes the command and sends a response message to the TIS within a set timeout period. TIS must wait for a reply before sending another message to OSCU/VSCU.
+21.1. Message sequence
+21.1.1. During communication, the OSCU/VSCU will always act as a service application
+
+responding to TIS requests.
+VSCU
+
+Response Data
+
+Data
+Before Receipt Closing
+
+Receipt Closing
+TIS
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 13 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+21.2. Message Time-out
+21.2.1. The TIS must ensure a 1000 ms time-out for receiving a reply. If no reply is
+
+received after the time-out, the TIS must resend the message. After a set number
+of failures, the
+TIS must display a warning for disconnecting.
+21.2.2. TIS messages shall be sent in xml format.
+21.3. Errors while processing the request
+21.3.1. In the case of an error, OSCU/VSCU has to reply with an error code message.
+21.4. Data Format
+21.4.1. Decimal numbers are presented with two decimal places. Decimal separator is dot
+
+(‘.’). For example: ’16.00’. Zero value is always presented as ‘0.00’.
+21.4.2. Date format is ‘DD/MM/YYYY’. For example: ‘20/01/2023’ for 20 January 2023.
+21.5. Message formatting between TIS and OSCU/VSCU
+
+Messages from the TIS to the OSCU/VSCU
+<PIN>P999999999Z</PIN>
+<CMD></CMD>
+<DATA></DATA>
+<CMD>
+
+Command code
+
+<DATA>
+
+Data field
+
+Messages from the OSCU/VSCU to the TIS
+<PIN>P999999999Z</PIN>
+<CMD></CMD>
+<DATA></DATA>
+<STATUS>P</STATUS>
+<CMD>
+
+Command code
+
+<DATA>
+
+Data field
+
+<STATUS>
+
+Status of the OSCU/VSCU
+
+21.6. OSCU/VSCU status code <STATUS>
+21.6.1. The OSCU/VSCU current state is coded and sent in each reply message:
+
+General usage
+’P’ – if command is successfully
+’E’ – if there is an error with the command
+
+21.6.2.
+
+Error codes are listed by their priority. Whatever error is first detected, it is
+the one that should be shown as the error code.
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 14 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+21.6.3. OSCU/VSCU Error codes:
+
+i.
+00 – no error;
+ii.
+11 – internal memory full;
+iii. 12 – internal data corrupted;
+iv. 13 – internal memory error;
+v. 20 – Real Time Clock error;
+vi. 30 – wrong command code;
+vii.
+31 – wrong data format in the TIS request data;
+viii.
+32 – wrong PIN in the TIS request data;
+ix.
+33 – wrong tax rate in the TIS request data;
+x.
+34 – invalid receipt number in the TIS request data;
+xi.
+40 – OSCU/VSCU not activated;
+xii.
+41 – OSCU/VSCU already activated;
+xiii. 42 – OSCU/VSCU Authentication error
+xiv. 90 – Internet error;
+xv.
+91 – Backup error;
+xvi. 99 – Hardware intervention is necessary.
+21.6.4. Warning codes:
+
+i. 0 – no warning;
+ii. 1 – OSCU/VSCU internal memory is near to full (it is at more than 90% of
+capacity); iii.
+2 – OSCU/VSCU internal memory is near to full (it is at more
+than 95% of capacity).
+21.7. Detailed command description
+21.7.1. This command is used to send TIS receipt data to OSCU/VSCU:
+
+CMD: SEND_RECEIPT
+Data field:
+
+<Rtype><TType>,<PIN>,<Date><Space><Time>,<RNum>,<
+TaxRate1>,<
+TaxRate2>,<TaxRate3>,<TaxRate4>,<Amount1>,<Amount2>,<Am
+ount3>,<Amount4>,<Tax1>,<Tax2>,<Tax3>,<Tax4>[,<ClientsPin>,
+<Clientphone>]
+
+Response:
+Comment:
+
+<Code><ErrorCode>
+
+RType
+TType
+PIN
+Date
+Time
+RNum
+TaxRate1,…,TaxRate4
+<Amount1>,…,<Amount4
+>
+<Tax1>,…,<Tax4>
+ClientsPin
+
+Receipt type: N - normal; C - copy; T - training; P - proforma
+Transaction type: S – sale; NC – Credit Note
+Tax registration number of the taxpayer
+Date of issuing the receipt: DD/MM/YYYY
+Time of issuing the receipt: HH:MM:SS
+Receipt number
+Percentage Tax rates
+Receipt amounts corresponding to each Tax (taxable amounts)
+Calculated taxes corresponding to each Tax (tax amounts)
+Tax registration number of the client.
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 15 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+Clientphone
+Code
+
+Phone number of the client
+‘P’ – the command is executed
+‘E’ – error
+Warning number when Code is P. Error number when Code is E
+
+ErrorCode
+
+21.7.2.
+
+This command is used to get OSCU/VSCU information for the last receipt
+processed by OSCU/VSCU:
+
+CMD: RECV_RECEIPT
+Data field:
+Response:
+Comment:
+
+<RNumber>
+<Snumber>,<TNumber>,<GNumber>,<RLabel>,<Date><Space><Time>,
+<Receipt Signature>,<Internal Data>
+
+Rnumber
+SNumber
+TNumber
+GNumber
+RLabel
+
+Receipt number
+OSCU/VSCU serial number as a string
+Receipt number per receipt type
+Total receipt number
+Receipt label, based on receipt type (N, C, P, T) and transaction type (S, R):
+<receipt type><transaction type>, for example: NS
+Date
+Date of accepting the receipt by the OSCU/VSCU: DD/MM/YYYY
+Time
+Time of accepting the receipt by the OSCU/VSCU: HH:MM:SS
+Receipt Signature Receipt Signature, sent as a string
+Internal Data
+Internal Data, sent as a string
+Exemplary
+SCU999123456,300234,234556,NS,19/01/201212:39:05,JVPGPLYGD
+responses:
+JRSMXF2,2ASOSCU/VSCUZBZ5AH3TZVVIKEXRW6IQ
+21.7.3.
+
+This command can be used to read the signatures for the last receipt
+processed by OSCU/VSCU:
+
+CMD: SIGNATURE_REQUEST
+Data field:
+
+<Type><RNumber>
+
+Response:
+
+<Signature>
+
+Comment:
+Type
+Rnumber
+
+R – Receipt Signature
+I – Internal Data
+Receipt number
+
+Signature
+
+OSCU/VSCU signature, sent as a string
+
+Exemplary
+responses:
+
+For the Receipt Signature:
+JVPGPLYGDJRSMXF2
+For the Internal Data:
+2ASOSCUZBZ5AH3TZVVIKEXRW6IQ
+
+21.7.4.
+
+This command can be used to read the counters for the last receipt
+processed by OSCU/VSCU:
+
+CMD: COUNTERS_REQUEST
+Data field:
+<RNumber>
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 16 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+Response:
+
+<TNumber>,<GNumber>,<Date><Space><Time>
+
+Comment:
+RNumber
+
+Receipt number, sent by the TIS
+
+TNumber
+
+Receipt number per receipt type
+
+GNumber
+
+Date
+
+Total receipt number
+Receipt label, based on receipt type (N, C, P, T) and transaction type (S, R):
+<receipt type><transaction type>, for example: NS
+Date of accepting the receipt by the OSCU/VSCU: DD/MM/YYYY
+
+Time
+
+Time of accepting the receipt by the OSCU/VSCU: HH:MM:SS
+
+Ex. response:
+
+300234,234556,NS,19/01/2023 12:39:05
+
+Rlabel
+
+21.7.5.
+
+This command is used to read the date and time of OSCU/VSCU:
+
+CMD: DATE_TIME_REQUEST
+Data field:
+No data
+Response:
+<Date><Space><Time>
+Comment:
+Date
+
+Current date of OSCU/VSCU: DD/MM/YYYY
+
+Time
+
+Current time of OSCU/VSCU: HH:MM:SS
+
+21.7.6.
+
+This command is used to read the serial number of OSCU/VSCU:
+
+CMD: ID_REQUEST
+Data field:
+No data
+Response:
+
+<SNumber>
+
+Comment:
+SNumber
+
+21.7.7.
+
+OSCU/VSCU serial number as a string
+
+EJ Data:
+
+CMD: EJ_DATA
+Data field:
+
+<String>
+
+Response:
+
+<Flg>
+
+Comment:
+String
+
+String that represent invoice print out.
+Each string of line must be ended by “\n”
+
+Flg
+
+'P' - operation succeed
+'E' - operation failure
+21.7.8.
+
+OSCU/VSCU Status:
+
+CMD: STATUS
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 17 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+Data field:
+Response:
+
+No data
+<Snumber>,<FWver>,<HWrev>,<CurrentZ>,<LastRemoteDate>,<Last
+LocalDate>
+
+Comment:
+Snumber
+
+OSCU/VSCU serial number
+
+FWver
+
+Firmware version
+
+HWrev
+
+Hardware revision
+
+CurrentZ
+
+The number of current OSCU/VSCU daily report
+
+LastRemoteDate
+
+Last remote audit date and time
+
+LastLocalDate
+
+Last local audit date and time
+
+21.7.9.
+
+A Trader Invoicing System must stop operating, whenever a
+communication error appears, due to the disconnection from the
+OSCU/VSCU or due to power failure interruption. After the error has been
+cleared, the continuation of the printing process must be enabled
+
+21.8. These commands are used to define the type of data to be shared between
+OSCU/VSCU and CIS. They are sent in XML format. The data flow transmission should
+be schedule to a maximum of 15 min.
+
+Tag
+
+Description
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 18 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+1.
+
+<CMD>
+
+<tin>
+
+SEND_RECEIPT: Used when OSCU/VSCU sends to Authority Server one
+or many Receipt records.
+2. SEND_RECEIPTITEM: Used when OSCU/VSCU sends to Authority Server
+one or many Receipt Item records.
+3. SEND_PURCHASE: Used when OSCU/VSCU sends to Authority Server one
+or many Purchase records.
+4. RECV_PURCHASEITEM: Used when OSCU/VSCU receives one or many
+PurchaseItem records from the Authority Server.
+5. SEND_PURCHASEITEM: Used when OSCU/VSCU sends to Authority
+Server one or many Purchase Item records.
+6. SEND_INVENTORY: Used when OSCU/VSCU sends to Authority Server
+one or many Current Stock records.
+7. SEND_ITEM: Used when OSCU/VSCU sends to Authority Server one or
+many Item description records.
+8. RECV_ITEM: Used when OSCU/VSCU receives one or many Item
+description records from the Authority Server.
+9. RECV_IMPORT_ITEM: Used when OSCU/VSCU receives one or many
+Importation records from the Authority Server.
+10. SEND_IMPORT_ITEM: Used when OSCU/VSCU sends one or many
+Importation record confirmations to the Authority Server.
+11. RECV_SYSCODECLS: Used when OSCU/VSCU receives one or many
+System Code
+Classification records from the Authority Server.
+12. RECV_SYSCODE: Used when OSCU/VSCU receives one or many System
+Code records from the Authority Server.
+13. RECV_TAXPAYER: Used when OSCU/VSCU receives one or many
+Taxpayer records from the Authority Server.
+Taxpayer Identification Number owning the OSCU/VSCU
+
+Each <DATA> tag contains different types of tags depending on the value in <CMD> as
+described below:
+
+Tag name
+taxRateD
+
+Description
+Tax rate D
+
+Sample data
+0
+
+totTaxablAmtA
+
+Total taxable amount A
+
+0
+
+TotTaxablAmtB
+
+Total taxable amount B
+
+295000
+
+TotTaxablAmtC
+
+Total taxable amount C
+
+0
+
+totTaxablAmtD
+
+Total taxable amount D
+
+0
+
+totTaxablAmtE
+totTaxA
+
+Total taxable amount E
+Total tax amount A
+
+0
+0
+
+totTaxB
+
+Total tax amount B
+
+45000
+
+totTaxC
+totTaxD
+
+Total tax amount C
+Total tax amount D
+
+0
+0
+
+totTaxE
+
+Total tax amount E
+
+0
+
+totTax
+
+Total Tax amount
+
+45000
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 19 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+totAmt
+
+Total amount
+
+295000
+
+rcptDt
+
+Invoice date
+
+21062017131534
+(DDMMYYYYHHMMSS)
+
+sdcRcptNo
+
+CU invoice number
+
+285
+
+totSdcRcptNo
+
+CU invoice number
+
+285
+
+internalData
+
+CU invoice Internal data
+
+G7ZTMX4DSSAPNR5C6UTSJYKRNA
+
+signature
+
+CU invoice signature
+
+OHYYSNKC2XQ2N3AM
+
+journal
+regusrId
+
+Electronic journal
+Register User id
+
+[RECEIPT TEXT]
+2
+
+regusrNm
+
+Register user name
+
+Test
+
+rptNo
+regDt
+
+Report number
+Send date
+
+2
+2017-06-21
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+13:15:35
+
+Page 20 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+24.8.2. For <CMD>value = SEND_RECEIPTITEM
+Tag name
+Description
+Sample data
+invId
+
+Invoice ID
+
+12
+
+bhfId
+
+Branch ID
+
+00
+
+itemSeq
+itemClsCd
+
+Item sequence
+Item Classification Code
+
+1
+3026530000
+
+itemCd
+
+Item Code
+
+KE2BEXUXXX0000001
+
+itemNm
+bcncId
+
+Item Name
+Customer PIN number
+
+Bar 12mm
+A999999999Z
+
+pkgUnitCd
+
+Packaging unit code
+
+BE (Sys Code:17)
+
+pkgQty
+
+Packaging quantity
+
+0
+
+qtyUnitCd
+
+Quantity unit code
+
+U(Sys Code:10)
+
+qty
+
+Quantity
+
+50
+
+untpc
+
+Unit price
+
+5900
+
+splpc
+dcRate
+
+Supplier price
+Discount rate
+
+295000
+0
+
+dcAmt
+
+Discount amount
+
+0
+
+taxablAmt
+taxTyCd
+
+Taxable amount
+Tax type code
+
+295000
+B(Sys Code:4)
+
+tax
+
+Tax amount
+
+45000
+
+totAmt
+
+Total amount
+
+295000
+
+24.8.3. For <CMD>value = RECV_PURCHASE
+The request for the <CMD> RECV_PURCHASE doesn’t require the data. However its
+response can contain zero or many rows.
+Tag name
+
+Description
+
+Sample data
+
+InvId
+
+Invoice ID
+
+251
+
+bhfId
+
+Branch ID
+
+00
+
+bcncId
+
+Customer PIN
+
+A999999999Z
+
+bcncSdcId
+
+Supplier CU ID
+
+KRACUCCXXXXXXXX
+
+regTyCd
+
+Registration Type code
+-M: Manual
+- A: Automatic
+
+M
+
+refId
+
+Reference Id (Supplier
+invoice number)
+
+2
+
+payTyCd
+
+Paymeny Type Code
+
+01
+
+invStatusCd
+
+Invoice status code
+
+02
+
+ocde
+
+Transaction Date
+
+20161219
+
+validDt
+
+Valid Date
+
+2016-12-19 09:05:12
+
+CancelReqDt
+
+Cancel Request Date
+
+2016-12-19 09:05:12
+
+canceledDt
+
+Canceld Date
+
+2016-12-19 09:05:12
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 21 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+cancelTyCd
+
+Cancel Type Code
+
+refundDt
+
+Refund Date
+
+2016-12-19 09:05:12
+
+totNumItem
+
+Total number item
+
+1
+
+totTaxablAmtA
+
+Total taxable amount A
+
+0
+
+totTaxablAmtB
+
+Total taxable amount B
+
+630000
+
+totTaxablAmtC
+
+Total taxable amount C
+
+0
+
+totTaxablAmtD
+
+Total taxable amount D
+
+0
+
+totTaxablAmtE
+
+Total taxable amount E
+
+0
+
+totTaxA
+
+Total tax A
+
+0
+
+totTaxB
+
+Total tax B
+
+96101.70
+
+totTaxC
+
+Total tax C
+
+0
+
+totTaxD
+
+Total tax D
+
+0
+
+totTaxE
+
+Total tax E
+
+0
+
+totSplpc
+
+Total Supplier Amount
+
+630000
+
+totTax
+
+Total Vat amount
+
+96101.70
+
+totAmt
+
+Total Amount
+
+630000
+
+remark
+
+Remark
+
+[FREE TEXT]
+
+regusrId
+
+Register user ID
+
+Teller
+
+regDt
+
+Register Date
+
+20161219171600
+
+24.8.4. For <CMD>value = SEND_PURCHASE
+Tags in <DATA> with a corresponding sample value
+Tag name
+
+Description
+
+Sample data
+
+table
+
+Target table
+
+TRNPURCHASE
+
+actionCd
+
+Target data processing
+
+ACT – INSERT
+
+InvId
+
+Purchase ID
+
+251
+
+bhfId
+
+Branch ID
+
+00
+
+Supplier PIN
+Supplier Name
+
+P123456789Z
+TAXPAYER X
+
+bcncSdcId
+
+Supplier CU Id
+
+KRACCXXXXXXXX
+
+regTyCd
+refId
+
+Registration Type Code
+Reference Id
+
+M
+1
+
+payTyCd
+
+Payment type code
+
+02
+
+Tag name
+invStatusCd
+
+Description
+Invoice Status Code
+
+Row bcncId
+(1..n) bcncNm
+
+Sample data
+02
+
+ocde
+
+Transaction date
+
+20161219
+
+validDt
+
+Valid Date
+
+2016-12-19 09:05:12
+
+cancelReqDt
+
+Cancel Request Date
+
+2016-12-19 09:05:12
+
+CancelDt
+
+Cancel Date
+
+2016-12-19 09:05:12
+
+refundDt
+
+Refund Date
+
+2016-12-19 09:05:12
+
+cancelTyCd
+
+Cancel Type Date
+
+totNumItem
+
+Total number item
+
+1
+
+totTaxablAmtA
+
+Total taxable amount A
+
+0
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 22 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+totTaxablAmtB
+
+Total taxable amount B
+
+630000
+
+totTaxablAmtC
+
+Total taxable amount C
+
+0
+
+totTaxablAmtD
+
+Total taxable amount D
+
+0
+
+totTaxablAmtE
+
+Total taxable amount E
+
+0
+
+totTaxA
+totTaxB
+
+Total tax A
+Total tax B
+
+0
+96101.70
+
+totTaxC
+
+Total tax C
+
+0
+
+totTaxD
+
+Total tax D
+
+0
+
+totTaxE
+
+Total tax E
+
+0
+
+totSplpc
+
+Total Supplier Amount
+
+630000
+
+totTax
+
+Total Vat amount
+
+96101.70
+
+totAmt
+
+Total Amount
+
+630000
+
+remark
+
+Remark
+
+[FREE TEXT]
+
+regusrId
+
+Register ID
+
+Teller
+
+regDt
+
+Register date
+
+20161219171600
+
+24.8.5. For <CMD>value = RECV_PURCHASEITEM
+The request for the <CMD> RECV_PURCHASEITEM doesn’t require the data. However its
+response can contain zero or many rows.
+21.12.4.1 Tags in <DATA> with a corresponding sample value of response for
+<CMD>=RECV_PURCHASEITEM
+Tag name
+
+Tag description
+
+Sample data
+
+invId
+
+Invoice ID
+
+251
+
+bhfId
+
+Branch ID
+
+00
+
+itemSeq
+
+Item sequence
+
+1
+
+itemClsCd
+
+Item Classification Code
+
+3026530000
+
+itemCd
+
+Item Code
+
+KE2BEXUXXX0000002
+
+itemNm
+
+Item Name
+
+Bar 10 mm
+
+bcncItemClsCd
+
+Supplier item class code
+
+3026530000
+
+bcncItemCd
+bcncItemNm
+
+Supplier item code
+Supplier item name
+
+17350053850030
+10 mm Bar
+
+pkgUnitCd
+
+Packaging unit code
+
+BE( Sys Code:17)
+
+pkgQty
+
+Packaging quantity
+
+10
+
+qtyUnitCd
+
+Quantity unit code
+
+U(Sys code:10)
+
+qty
+
+Quantity
+
+150
+
+expirDt
+
+Expiry date
+
+20200801
+
+untpc
+
+Unit price
+
+4200
+
+splpc
+
+Supplier price
+
+630000
+
+dcRate
+dcAmt
+
+Discount rate
+Discount amount
+
+0
+0
+
+taxablAmt
+
+Taxable amount
+
+630000
+
+taxTyCd
+
+Tax type code
+
+B( Sys Code:4)
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 23 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+tax
+
+Tax amount
+
+96101.70
+
+totAmt
+
+Total amount
+
+630000
+
+regTyCd
+
+Registration type code
+
+M
+
+24.8.6. For <CMD>value = SEND_PURCHASEITEM
+
+Tags in <DATA> with a corresponding sample value
+Tag name
+
+Tag Description
+
+Sample data
+
+invId
+
+Invoice ID
+
+251
+
+bhfId
+
+Branch ID
+
+00
+
+refId
+
+Reference ID
+
+1
+
+itemSeq
+
+Item sequence
+
+1
+
+itemClsCd
+
+Item Classification Code
+
+3026530000
+
+itemCd
+
+Item Code
+
+KE2BEXUXXX0000002
+
+itemNm
+
+Item Name
+
+Bar 10 mm
+
+bcncItemClsCd
+bcncItemCd
+
+Supplier item class code
+Supplier item code
+
+3026530000
+17350053850030
+
+bcncItemNm
+
+Supplier item name
+
+10 mm Bar
+
+pkgUnitCd
+
+Packaging unit code
+
+BE( Sys Code:17)
+
+pkgQty
+
+Packaging quantity
+
+10
+
+qtyUnitCd
+
+Quantity unit code
+
+U(Sys code:10)
+
+qty
+
+Quantity
+
+150
+
+expirDt
+
+Expiry date
+
+20200801
+
+untpc
+
+Unit price
+
+4200
+
+splpc
+
+Supplier price
+
+630000
+
+dcRate
+
+Discount rate
+
+0
+
+dcAmt
+
+Discount amount
+
+0
+
+taxablAmt
+
+Taxable amount
+
+630000
+
+taxTyCd
+
+Tax type code
+
+B( Sys Code:4)
+
+tax
+
+Tax amount
+
+96101.70
+
+totAmt
+
+Total amount
+
+630000
+
+Registration type code
+
+M
+
+24.8.7.
+regTyCd
+
+For <CMD>value = SEND_INVENTORY
+24.8.7.1. Tags in <DATA> with a corresponding sample value
+Tag name
+Description
+Pin
+Personal Identification Number
+
+Sample data
+P123456789Z
+
+bhfId
+
+Branch ID
+
+00
+
+itemClsCd
+
+Item Classification Code
+
+3026530000
+
+itemCd
+qty
+
+Item Code
+Quantity
+
+KE2BEXUXXX0000001
+120
+
+updDt
+
+Update date
+
+2018-02-05 13:02:52
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 24 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+24.8.8. For <CMD>value = SEND_ITEM
+24.8.8.1. Tags in <DATA> with a corresponding sample value
+Tag name
+
+Description
+
+Sample data
+
+itemCd
+
+Item Code
+
+KE2BEXUXXX0000028
+
+itemClsCd
+
+Item classification code
+
+5612180500
+
+itemNm
+itemTyCd
+
+Item name
+Item type code
+
+Bar 15mm
+2
+
+OrgplceCd
+
+Origin country
+
+KE
+
+PkgUnitCd
+
+Packaging unit code
+
+JY
+
+QtyUnitCd
+
+Quantity unit code
+
+KG
+
+AdiInfo
+
+Addition information
+
+0001
+
+itemStd
+
+InitlWhUntpc Initial unit price
+
+2000
+
+InitlQty
+
+Beginning stock
+
+10
+
+Tag name
+AvgWhUntpc
+
+Description
+Average unit price
+
+2000
+
+dfltDlUntpc
+
+Sale price
+
+2000
+
+taxTyCd
+
+Tax type code
+
+B
+
+rm
+useYn
+
+Remark
+Item usage on market
+
+[FREE TEXT]
+Y
+
+regusrId
+
+Register username
+
+User1
+
+regDt
+
+Register date
+
+updusrId
+
+Update username
+
+20180301144328
+(YYYYMMDDHHmmSS)
+User1
+
+updDt
+
+Update date
+
+safetyQty
+useBarcode
+
+Security stock quantity
+Use of barcode
+
+20180301144328
+(YYYYMMDDHHmmSS)
+0
+N
+
+changeYn
+
+Change yes/no
+
+N
+
+useAdiYn
+
+Sample data
+
+Y
+
+24.8.9. For <CMD>value = RECV_ITEM
+The request for the <CMD> RECV_ITEM doesn’t require any row. However its response
+can contain zero or many rows.
+24.8.9.1. Tags in <DATA> with a corresponding sample value of response for
+<CMD>=RECV_ITEM
+Tag name
+Table
+actionCd
+Row
+itemCd
+(1..n)
+itemClsCd
+itemNm
+
+Tag Description
+Target table
+
+Sample data
+ITMITEM
+
+Target data processing
+
+ACT – INSERT
+
+Item Code
+Item classification code
+
+KE2JYXLTR0000016
+5015151300
+
+Item name
+
+zahabu 3 litres
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 25 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+itemTyCd
+
+Item type code
+
+2
+
+itemStd
+OrgplceCd
+
+Origin country
+
+KE
+
+PkgUnitCd
+
+Packaging unit code
+
+JY
+
+QtyUnitCd
+taxTyCd
+
+Quantity unit code
+Tax type code
+
+LTR
+B
+
+useYn
+
+Item usage on market
+
+Y
+
+regusrId
+
+Register username
+
+regDt
+
+Register date
+
+useBarcode
+
+Use of barcode
+
+User1
+2017-04-24 16:18:00 (YYYY-MM-DD
+HH:mm:SS)
+N
+
+changeYn
+
+Change yes/no
+
+N
+
+useAdiYn
+
+Y
+
+24.8.10. For <CMD>value = RECV_IMPORT_ITEM
+
+The request for the <CMD> RECV_IMPORT_ITEM doesn’t require any row. However its
+response can contain zero or many rows.
+24.8.10.1. Tags in <DATA> with a corresponding sample value of response for
+<CMD>=RECV_IMPORT_ITEM
+Tag name
+
+Description
+
+Sample data
+
+operationCd
+
+Operation code
+
+1141093
+
+dclrtDate
+itemSeq
+
+Declaration date
+Item Sequence
+
+20160826
+1
+
+hsCd
+
+HS Code
+
+84715000000
+
+itemNm
+
+Item name
+
+ETIMS INCOTEX 171 (2 IN 1)
+
+orgplceCd
+
+Origin Code
+
+BG
+
+expNatCd
+pkgQty
+
+Export Country Code
+Packaging quantity
+
+BG
+30
+
+qty
+
+Quantity
+
+298
+
+qtyUnitcd
+
+Quantity unit code
+
+NMB
+
+grossWt
+
+Gross Weight
+
+434
+
+netWt
+
+Net weight
+
+434
+
+supplierNm
+
+Supplier name
+
+AL-AZHAR AUTO SPARE PARTS
+P.O BOX 81694 DEIRA
+DUBAI-UNITED ARAB EMIRATES
+
+agentNm
+
+invCurCd
+
+Agent name
+HATARI CLEARING AGENCY LTD
+Invoice Amount in foreign
+34800
+currency
+Invoice currency
+USD
+
+invCurRate
+
+Exchange rate
+
+invAmtFcx
+
+804
+
+24.8.11. For <CMD>value = SEND_IMPORT_ITEM
+
+24.8.11.1. Tags in <DATA> with a corresponding sample value
+Tag name
+
+Description
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Sample data
+Page 26 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+operationCd
+
+Operation code
+
+1141093
+
+dclrtDate
+
+Declaration date
+
+20160826
+
+itemSeq
+
+Item sequence
+
+1
+
+approvalStatusCd Approval status code
+
+3
+
+itemClsCd
+
+Item classification code
+
+itemCd
+
+Item code
+
+commF
+
+Communication status
+
+Y
+
+remark
+
+remark
+
+(FREE
+TEXT)
+
+24.8.12. For <CMD>value = RECV_SYSCODECLS
+The request for the <CMD> RECV_SYSCODECLS doesn’t require any row. However its
+response can contain zero or many rows.
+24.8.12.1. Tags in <DATA> with a corresponding sample value of response for
+<CMD>=RECV_SYSCODECLS
+Tag name
+
+Tag description
+
+Sample data
+
+table
+
+Target table
+
+SYSCODECLS
+
+actionCd
+
+Target data processing
+
+ACT – INSERT
+
+Code classification
+
+39
+
+Classification name
+
+Warning Type
+
+Row codeCls
+(1..n) codeClsNm
+codeClsDc
+
+Classification description Different warning message
+
+useYn
+
+In use Yes/No
+
+Y
+
+24.8.13. For <CMD>value = RECV_SYSCODE
+
+The request for the <CMD> RECV_SYSCODE doesn’t require any row. However its
+response can contain zero or many rows.
+24.8.13.1. Tags in <DATA> with a corresponding sample value of response for
+<CMD>=RECV_SYSCODE
+Tag name
+
+Tag description
+
+Sample data
+
+codeCls
+
+Code classification
+
+38
+
+code
+
+Classification name
+
+R
+
+codeNm
+
+Classification description Refund
+
+codeDc
+
+Code description
+
+useYn
+
+In use Yes/No
+
+Invoice refund
+
+24.8.14. For <CMD>value = RECV_TAXPAYER
+The request for the <CMD> RECV_TAXPAYER doesn’t require any row. However its
+response can contain zero or many rows.
+24.8.14.1. Tags in <DATA> with a corresponding sample value of response for
+<CMD>=RECV_TAXPAYER
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 27 of 28
+
+PUBLIC
+
+ISO 9001:2015 CERTIFIED
+
+Tag name
+Pin
+
+Tag description
+
+Sample data
+
+bizCnd
+
+Personal Identification
+Number
+Business activity
+
+P123456789Z
+Wholesaler of different products
+
+province
+
+County
+
+NAIROBI CITY
+
+district
+
+Sub-County
+
+WESTLANDS
+
+sector
+locDc
+
+Tax Locality
+Physical Location
+
+West of Nairobi
+Chiromo Lane
+
+Technical Specification of TIS for OSCU/VSCU, Ver.2.0, released April 2023
+
+Page 28 of 28
+
+
