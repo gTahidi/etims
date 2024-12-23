@@ -359,6 +359,8 @@ type SalesItem struct {
 	TotAmt    float64 `json:"totAmt"`
 }
 
+// Validate checks if the required fields of SalesRequest are filled.
+// It returns an error if any of the required fields are empty.
 func (r SalesRequest) Validate() error {
 	if r.Tin == "" {
 		return fmt.Errorf("tin is required")
@@ -493,50 +495,50 @@ type ItemClass struct {
 
 // PurchaseRequest represents a purchase transaction
 type PurchaseRequest struct {
-	Tin         string       `json:"tin"`
-	BhfId       string       `json:"bhfId"`
-	InvcNo      string       `json:"invcNo"`
-	OrgInvcNo   string       `json:"orgInvcNo"`
-	SpplrTin    string       `json:"spplrTin"`
-	SpplrNm     string       `json:"spplrNm"`
-	SpplrBhfId  string       `json:"spplrBhfId"`
-	RegTyCd     string       `json:"regTyCd"`
-	PchsTyCd    string       `json:"pchsTyCd"`
-	RcptTyCd    string       `json:"rcptTyCd"`
-	PmtTyCd     string       `json:"pmtTyCd"`
-	PchsSttsCd  string       `json:"pchsSttsCd"`
-	CfmDt       string       `json:"cfmDt"`
-	PchsDt      string       `json:"pchsDt"`
-	WrhsDt      string       `json:"wrhsDt"`
-	CnclReqDt   string       `json:"cnclReqDt"`
-	CnclDt      string       `json:"cnclDt"`
-	RfdDt       string       `json:"rfdDt"`
-	RfdRsnCd    string       `json:"rfdRsnCd"`
-	TotItemCnt  int          `json:"totItemCnt"`
-	TaxblAmtA   float64      `json:"taxblAmtA"`
-	TaxblAmtB   float64      `json:"taxblAmtB"`
-	TaxblAmtC   float64      `json:"taxblAmtC"`
-	TaxblAmtD   float64      `json:"taxblAmtD"`
-	TaxblAmtE   float64      `json:"taxblAmtE"`
-	TaxRtA      float64      `json:"taxRtA"`
-	TaxRtB      float64      `json:"taxRtB"`
-	TaxRtC      float64      `json:"taxRtC"`
-	TaxRtD      float64      `json:"taxRtD"`
-	TaxRtE      float64      `json:"taxRtE"`
-	TaxAmtA     float64      `json:"taxAmtA"`
-	TaxAmtB     float64      `json:"taxAmtB"`
-	TaxAmtC     float64      `json:"taxAmtC"`
-	TaxAmtD     float64      `json:"taxAmtD"`
-	TaxAmtE     float64      `json:"taxAmtE"`
-	TotTaxblAmt float64      `json:"totTaxblAmt"`
-	TotTaxAmt   float64      `json:"totTaxAmt"`
-	TotAmt      float64      `json:"totAmt"`
-	Remark      string       `json:"remark"`
-	RegrId      string       `json:"regrId"`
-	RegrNm      string       `json:"regrNm"`
-	ModrId      string       `json:"modrId"`
-	ModrNm      string       `json:"modrNm"`
-	ItemList    []StockItem  `json:"itemList"`
+	Tin         string      `json:"tin"`
+	BhfId       string      `json:"bhfId"`
+	InvcNo      string      `json:"invcNo"`
+	OrgInvcNo   string      `json:"orgInvcNo"`
+	SpplrTin    string      `json:"spplrTin"`
+	SpplrNm     string      `json:"spplrNm"`
+	SpplrBhfId  string      `json:"spplrBhfId"`
+	RegTyCd     string      `json:"regTyCd"`
+	PchsTyCd    string      `json:"pchsTyCd"`
+	RcptTyCd    string      `json:"rcptTyCd"`
+	PmtTyCd     string      `json:"pmtTyCd"`
+	PchsSttsCd  string      `json:"pchsSttsCd"`
+	CfmDt       string      `json:"cfmDt"`
+	PchsDt      string      `json:"pchsDt"`
+	WrhsDt      string      `json:"wrhsDt"`
+	CnclReqDt   string      `json:"cnclReqDt"`
+	CnclDt      string      `json:"cnclDt"`
+	RfdDt       string      `json:"rfdDt"`
+	RfdRsnCd    string      `json:"rfdRsnCd"`
+	TotItemCnt  int         `json:"totItemCnt"`
+	TaxblAmtA   float64     `json:"taxblAmtA"`
+	TaxblAmtB   float64     `json:"taxblAmtB"`
+	TaxblAmtC   float64     `json:"taxblAmtC"`
+	TaxblAmtD   float64     `json:"taxblAmtD"`
+	TaxblAmtE   float64     `json:"taxblAmtE"`
+	TaxRtA      float64     `json:"taxRtA"`
+	TaxRtB      float64     `json:"taxRtB"`
+	TaxRtC      float64     `json:"taxRtC"`
+	TaxRtD      float64     `json:"taxRtD"`
+	TaxRtE      float64     `json:"taxRtE"`
+	TaxAmtA     float64     `json:"taxAmtA"`
+	TaxAmtB     float64     `json:"taxAmtB"`
+	TaxAmtC     float64     `json:"taxAmtC"`
+	TaxAmtD     float64     `json:"taxAmtD"`
+	TaxAmtE     float64     `json:"taxAmtE"`
+	TotTaxblAmt float64     `json:"totTaxblAmt"`
+	TotTaxAmt   float64     `json:"totTaxAmt"`
+	TotAmt      float64     `json:"totAmt"`
+	Remark      string      `json:"remark"`
+	RegrId      string      `json:"regrId"`
+	RegrNm      string      `json:"regrNm"`
+	ModrId      string      `json:"modrId"`
+	ModrNm      string      `json:"modrNm"`
+	ItemList    []StockItem `json:"itemList"`
 }
 
 // StockMasterRequest represents a request to update the stock master

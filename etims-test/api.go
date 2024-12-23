@@ -27,6 +27,9 @@ type Config struct {
 	} `json:"logging"`
 }
 
+// loadConfig reads a JSON configuration file and returns a Config object.
+// The function returns an error if the file cannot be read or if the JSON
+// cannot be parsed into a Config object.
 func loadConfig(path string) (*Config, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
@@ -41,6 +44,11 @@ func loadConfig(path string) (*Config, error) {
 	return &config, nil
 }
 
+// setupLogger configures a logger using the settings in the given configuration object.
+//
+// If the logging level in the configuration is invalid, it defaults to the InfoLevel.
+// The logging format is set to JSON if the configuration specifies so, otherwise it
+// defaults to a text format with timestamps.
 func setupLogger(config *Config) *logrus.Logger {
 	logger := logrus.New()
 
@@ -66,6 +74,19 @@ func setupLogger(config *Config) *logrus.Logger {
 	return logger
 }
 
+// Main is the entry point of the application.
+//
+// It sets up a logger and VSCU client using the configuration file, then
+// processes test data files in order. Each file is processed according to its
+// type, and the response is logged.
+//
+// The supported file types are:
+//
+// - branch_customer.json: SaveBranchCustomer
+// - item.json: SaveItem
+// - stock.json: SaveStock
+// - purchase.json: SavePurchase and CreateStockMovementFromPurchase
+// - sales.json: SaveSales and CreateStockMovementFromSale
 func main() {
 	// Parse command line flags
 	configPath := flag.String("config", "config/config.json", "path to configuration file")
@@ -108,7 +129,7 @@ func main() {
 	// Process files in order
 	for _, filename := range fileOrder {
 		filepath := filepath.Join(*testDataDir, filename)
-		
+
 		// Skip if file doesn't exist
 		if _, err := os.Stat(filepath); os.IsNotExist(err) {
 			logger.WithField("file", filepath).Info("File does not exist, skipping")
