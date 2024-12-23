@@ -10,8 +10,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"etims-test/client"
-	"etims-test/models"
+	"etims-test/internal/app/models"
+	"etims-test/internal/client"
 )
 
 type Config struct {
@@ -111,11 +111,6 @@ func main() {
 		config.API.CmcKey,
 		logger,
 	)
-
-	// Initialize device and sync data
-	if err := initializeAndSync(client, logger); err != nil {
-		logger.WithError(err).Fatal("Failed to initialize device and sync data")
-	}
 
 	// Define the order of processing
 	fileOrder := []string{
@@ -266,87 +261,4 @@ func main() {
 			logger.WithField("stockMovement", stockMovement).Info("Stock movement created for sale")
 		}
 	}
-}
-
-// Initialize device and sync basic data
-// Initialize device and sync basic data
-func initializeAndSync(client *client.VSCUClient, logger *logrus.Logger) error {
-	// 1. Device initialization
-	logger.Info("Initializing device")
-	_, err := client.InitializeDevice()
-	if err != nil {
-		// Check if error is APIError type and has code 902 (device already initialized)
-		if e, ok := err.(interface{ Code() string }); ok && e.Code() == "902" {
-			logger.Info("Device is already initialized, proceeding with sync")
-		} else {
-			return fmt.Errorf("device initialization failed: %w", err)
-		}
-	}
-
-	// Get current timestamp for sync
-	lastReqDt := client.GetCurrentTimestamp()
-
-	// 2. Sync basic data
-	logger.Info("Syncing basic data")
-
-	// Get code list
-	codeResp, err := client.GetCodeList(lastReqDt)
-	if err != nil {
-		return fmt.Errorf("failed to sync code list: %w", err)
-	}
-	if codeResp.ResultCd == "001" {
-		logger.Info("No code list found")
-	} else if codeResp.ResultCd != "000" {
-		return fmt.Errorf("failed to sync code list: API error: %s (code: %s)", codeResp.ResultMsg, codeResp.ResultCd)
-	}
-
-	// Get item classification list
-	itemClassResp, err := client.GetItemClassList(lastReqDt)
-	if err != nil {
-		return fmt.Errorf("failed to sync item classifications: %w", err)
-	}
-	if itemClassResp.ResultCd == "001" {
-		logger.Info("No item classification list found")
-	} else if itemClassResp.ResultCd != "000" {
-		return fmt.Errorf("failed to sync item classifications: API error: %s (code: %s)", itemClassResp.ResultMsg, itemClassResp.ResultCd)
-	}
-
-	// Get branch list
-	branchResp, err := client.GetBranchList(lastReqDt)
-	if err != nil {
-		return fmt.Errorf("failed to sync branch list: %w", err)
-	}
-	if branchResp.ResultCd == "001" {
-		logger.Info("No branch list found")
-	} else if branchResp.ResultCd != "000" {
-		return fmt.Errorf("failed to sync branch list: API error: %s (code: %s)", branchResp.ResultMsg, branchResp.ResultCd)
-	}
-
-	// Get notices
-	noticeResp, err := client.GetNoticeList(lastReqDt)
-	if err != nil {
-		return fmt.Errorf("failed to sync notices: %w", err)
-	}
-	if noticeResp.ResultCd == "001" {
-		logger.Info("No notices found")
-	} else if noticeResp.ResultCd != "000" {
-		return fmt.Errorf("failed to sync notices: API error: %s (code: %s)", noticeResp.ResultMsg, noticeResp.ResultCd)
-	}
-
-	// 3. Sync imported items (if head office)
-	if client.BhfId == "00" {
-		logger.Info("Syncing imported items")
-		importedItemsResp, err := client.GetImportedItems(lastReqDt)
-		if err != nil {
-			return fmt.Errorf("failed to sync imported items: %w", err)
-		}
-		if importedItemsResp.ResultCd == "001" {
-			logger.Info("No imported items found")
-		} else if importedItemsResp.ResultCd != "000" {
-			return fmt.Errorf("failed to sync imported items: API error: %s (code: %s)", importedItemsResp.ResultMsg, importedItemsResp.ResultCd)
-		}
-	}
-
-	logger.Info("Initialization and sync completed successfully")
-	return nil
 }

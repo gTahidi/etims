@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"etims-test/models"
+	"etims-test/internal/app/models"
 )
 
 // StockData represents the structure for stock data
